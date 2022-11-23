@@ -1,13 +1,22 @@
 //
-// Created by 梁俊华 on 11/21/22.
+// Created by 梁俊华 on 11/22/22.
 //
-
-#ifndef REPCREC_SITE_H
-#define REPCREC_SITE_H
-
+#include "variable.h"
+#include <map>
 
 class Site {
+public:
+    explicit Site();
+
+    [[nodiscard]] bool is_available() const;
+    [[nodiscard]] int getSiteId() const;
+    void dump() const;
+
+private:
+    int id_;
+    bool is_available_;
+
+    std::map<int, std::shared_ptr<Variable>> variables_;
+
+    static int increase_id_;
 };
-
-
-#endif//REPCREC_SITE_H
