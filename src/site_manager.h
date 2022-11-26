@@ -16,8 +16,11 @@ public:
 
     void dump() const;
 
+    std::shared_ptr<Site> get_site(int site_id);
+    void set_unavailable(int site_id);
+
 private:
-    std::map<int, std::unique_ptr<Site>> sites_;
+    std::map<int, std::shared_ptr<Site>> sites_;
 };
 
 

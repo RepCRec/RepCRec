@@ -11,16 +11,16 @@
 
 class Transaction {
 public:
-    Transaction();
-    ~Transaction();
+    Transaction(int transaction_id, bool is_read_only = false);
+    ~Transaction() = default;
 
     [[nodiscard]] int get_transaction_id() const;
+    [[nodiscard]] bool is_read_only() const;
 
 private:
     int transaction_id_;
-    std::vector<std::shared_ptr<Instruction>> instructions_;
-
-    static int initial_id_;
+    bool is_read_only_;
+    std::vector<int> accessed_sites_;
 };
 
 

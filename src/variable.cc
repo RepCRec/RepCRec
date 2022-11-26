@@ -4,14 +4,7 @@
 
 #include "variable.h"
 
-int Variable::initial_id_ = 1;
-
-Variable::Variable() : id_(initial_id_) {
-    value_ = id_ * 10;
-    ++initial_id_;
-}
-
-Variable::~Variable() = default;
+Variable::Variable(repcrec::var_id_t var_id) : id_(var_id), value_(var_id * 10), latest_commit_time_(-1) {}
 
 std::shared_ptr<Transaction> Variable::get_exclusive_lock_owner() {
     return exclusive_lock_owner_;
@@ -43,7 +36,7 @@ void Variable::remove_exclusive_owner() {
     exclusive_lock_owner_ = nullptr;
 }
 
-bool Variable::remove_shared_owner(int tid) {
+bool Variable::remove_shared_owner(repcrec::tran_id_t tid) {
     if (!shared_lock_owners_.count(tid)) {
         return false;
     }
@@ -52,10 +45,30 @@ bool Variable::remove_shared_owner(int tid) {
     return true;
 }
 
-int Variable::get_id() const {
+repcrec::var_id_t Variable::get_id() const {
     return id_;
 }
 
-int Variable::get_value() const {
+repcrec::var_t Variable::get_value() const {
     return value_;
+}
+
+void Variable::set_value(repcrec::var_t value) {
+    value_ = value;
+}
+
+bool Variable::has_shared_lock(repcrec::tran_id_t tran_id) const {
+    return shared_lock_owners_.contains(tran_id);
+}
+
+bool Variable::has_exclusive_lock(repcrec::tran_id_t tran_id) const {
+    return exclusive_lock_owner_ != nullptr and exclusive_lock_owner_->get_transaction_id() == tran_id;
+}
+
+bool Variable::has_shared_lock_exclude_self(repcrec::tran_id_t tran_id) const {
+    return !shared_lock_owners_.empty() and !shared_lock_owners_.contains(tran_id);
+}
+
+bool Variable::has_exclusive_lock_exclude_self(repcrec::tran_id_t tran_id) const {
+    return exclusive_lock_owner_ != nullptr and exclusive_lock_owner_->get_transaction_id() != tran_id;
 }

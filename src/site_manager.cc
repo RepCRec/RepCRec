@@ -18,4 +18,10 @@ void SiteManager::dump() const {
     }
 }
 
+std::shared_ptr<Site> SiteManager::get_site(int site_id) {
+    return sites_[site_id];
+}
 
+void SiteManager::set_unavailable(int site_id) {
+    sites_[site_id]->set_unavailable();
+}

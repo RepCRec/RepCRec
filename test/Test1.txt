@@ -1,0 +1,5 @@
+begin(T1)
+W(T1,x1,101)
+W(T1,x2,102)
+end(T1)
+dump()
