@@ -10,11 +10,19 @@ void process_test_file(const std::string_view& file_name) {
     std::string insr;
     repcrec::timestamp_t timestamp = 1;
     while (getline(insr_file, insr)) {
+        printf("INFO: Start executing %s\n", insr.c_str());
         TransactionManager::get_instance().add_instruction(std::make_shared<Instruction>(insr), timestamp);
         TransactionManager::get_instance().execute_instructions(timestamp);
         ++timestamp;
     }
     insr_file.close();
+    while (!TransactionManager::get_instance().is_all_instructions_finished()) {
+        TransactionManager::get_instance().execute_instructions(timestamp);
+        ++timestamp;
+    }
+    // extra dump
+    TransactionManager::get_instance().add_instruction(std::make_shared<Instruction>("dump()"), timestamp++);
+    TransactionManager::get_instance().execute_instructions(timestamp);
 }
 
 int main(int argc, char** argv) {

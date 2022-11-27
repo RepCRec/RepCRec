@@ -48,8 +48,6 @@ Instruction::Instruction(const std::string& insr) : id_(initial_id_++) {
         var_value_ = std::stoi(tokens[2]);
     } else if (insr.starts_with("R")) {
         type_ = InstructType::READ;
-    } else if (insr.starts_with("COMMIT")) {
-        type_ = InstructType::COMMIT;
     } else {
         type_ = InstructType::UNKNOWN;
     }

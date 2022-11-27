@@ -18,6 +18,14 @@ repcrec::LockStatus LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_
         std::shared_ptr<Variable> var = site->get_variable(var_id);
         if (var != nullptr and (var->has_exclusive_lock_exclude_self(tran_id) or var->has_shared_lock_exclude_self(tran_id))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
+            if (var->has_exclusive_lock_exclude_self(tran_id)) {
+                lock_status.owner_id_set.insert(var->get_exclusive_lock_owner()->get_transaction_id());
+            }
+            if (var->has_shared_lock_exclude_self(tran_id)) {
+                for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
+                    lock_status.owner_id_set.insert(shared_owner_id);
+                }
+            }
             return lock_status;
         }
         if (var != nullptr and var->has_exclusive_lock(tran_id)) {
@@ -37,6 +45,14 @@ repcrec::LockStatus LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_
         if (var != nullptr and (var->has_shared_lock_exclude_self(tran_id) or var->has_exclusive_lock_exclude_self(tran_id))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             lock_status.site_id_set.clear();
+            if (var->has_exclusive_lock_exclude_self(tran_id)) {
+                lock_status.owner_id_set.insert(var->get_exclusive_lock_owner()->get_transaction_id());
+            }
+            if (var->has_shared_lock_exclude_self(tran_id)) {
+                for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
+                    lock_status.owner_id_set.insert(shared_owner_id);
+                }
+            }
             return lock_status;
         }
         lock_status.site_id_set.insert(sid);
@@ -119,7 +135,21 @@ void LockManager::release_locks(repcrec::tran_id_t tran_id) {
             }
         }
     }
+    std::unordered_set<repcrec::tran_id_t> empty_ids;
+    for (auto& [tid, tids] : wait_for_graph_) {
+        if (tids.contains(tran_id)) {
+            tids.erase(tran_id);
+        }
+        if (tids.empty()) {
+            empty_ids.insert(tid);
+        }
+    }
+    for (const repcrec::tran_id_t& tid : empty_ids) {
+        wait_for_graph_.erase(tid);
+    }
+    wait_for_graph_.erase(tran_id);
     lock_table_.erase(tran_id);
+    printf("INFO: T%d releases all its locks.\n", tran_id);
 }
 
 void LockManager::assign_write_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id) {
@@ -129,6 +159,7 @@ void LockManager::assign_write_lock(repcrec::tran_id_t tran_id, std::unordered_s
         if (site->is_available()) {
             std::shared_ptr<Variable> var = site->get_variable(var_id);
             var->set_exclusive_transaction(TransactionManager::get_instance().get_transaction(tran_id));
+            lock_table_[tran_id].insert(var_id);
         }
     }
 }
@@ -144,7 +175,25 @@ void LockManager::assign_share_lock(repcrec::tran_id_t tran_id, std::unordered_s
     }
 }
 
+void LockManager::assign_wait_for_graph(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& owner_ids) {
+    for (const repcrec::tran_id_t& owner_id : owner_ids) {
+        wait_for_graph_[tran_id].insert(owner_id);
+    }
+}
+
+bool LockManager::is_waiting_for_lock(repcrec::tran_id_t tran_id) const {
+    return wait_for_graph_.contains(tran_id);
+}
+
 bool LockManager::detect_deadlock() {
+//    for (const auto& [x, ys] : wait_for_graph_) {
+//        printf("%d: ", x);
+//        for (const auto& y : ys) {
+//            printf("%d ", y);
+//        }
+//        printf("\n");
+//    }
+
     std::unordered_map<repcrec::tran_id_t, dfs_status> visited;
     std::vector<repcrec::tran_id_t> tran_set;
     for (const auto& [curr_tran_id, _] : wait_for_graph_) {

@@ -8,6 +8,7 @@
 #include "global.h"
 
 #include <memory>
+#include "instruction.h"
 
 class Request {
 public:
@@ -16,11 +17,17 @@ public:
 
     virtual void exec() = 0;
 
+    [[nodiscard]] repcrec::timestamp_t get_timestamp() const;
+    [[nodiscard]] repcrec::timestamp_t get_transaction_id() const;
+    void set_type(InstructType type);
+    [[nodiscard]] InstructType get_type() const;
+
 protected:
     repcrec::timestamp_t timestamp_;
     repcrec::tran_id_t tran_id_;
     repcrec::site_id_t site_id_;
     repcrec::var_id_t var_id_;
+    InstructType type_;
 };
 
 class WriteRequest : public Request {
@@ -40,6 +47,10 @@ public:
     ~ReadRequest() override = default;
 
     void exec() override;
+
+private:
+    void handle_read_only_request();
+    void handle_read_request();
 };
 
 class CreateTransactionRequest : public Request {

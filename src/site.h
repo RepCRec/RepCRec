@@ -4,6 +4,7 @@
 #include "variable.h"
 #include "global.h"
 #include <map>
+#include <memory>
 
 class Site {
 public:
@@ -22,8 +23,6 @@ public:
 private:
     repcrec::site_id_t id_;
     bool is_available_;
-
     std::map<repcrec::var_id_t, std::shared_ptr<Variable>> variables_;
-
     static repcrec::site_id_t increase_id_;
 };

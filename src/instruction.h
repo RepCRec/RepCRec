@@ -17,8 +17,7 @@ enum struct InstructType {
     RECOVER = 5,
     FAIL = 6,
     DUMP = 7,
-    END = 8,
-    COMMIT = 9
+    END = 8
 };
 
 class Instruction {

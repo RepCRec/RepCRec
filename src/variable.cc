@@ -4,7 +4,7 @@
 
 #include "variable.h"
 
-Variable::Variable(repcrec::var_id_t var_id) : id_(var_id), value_(var_id * 10), latest_commit_time_(-1) {}
+Variable::Variable(repcrec::var_id_t var_id) : id_(var_id), value_(var_id * 10), latest_commit_time_(0) {}
 
 std::shared_ptr<Transaction> Variable::get_exclusive_lock_owner() {
     return exclusive_lock_owner_;

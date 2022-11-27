@@ -28,8 +28,10 @@ public:
     repcrec::LockStatus try_acquire_read_lock(repcrec::tran_id_t tran_id, repcrec::var_id_t var_id);
     void assign_write_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id);
     void assign_share_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id);
+    void assign_wait_for_graph(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& owner_ids);
     void release_locks(repcrec::tran_id_t tran_id);
     bool detect_deadlock();
+    [[nodiscard]] bool is_waiting_for_lock(repcrec::tran_id_t tran_id) const;
 
 private:
     std::unordered_map<repcrec::tran_id_t, std::unordered_set<repcrec::var_id_t>> lock_table_;

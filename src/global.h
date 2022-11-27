@@ -30,6 +30,7 @@ namespace repcrec {
     struct LockStatus {
         std::unordered_set<site_id_t> site_id_set;
         lock_status status;
+        std::unordered_set<tran_id_t> owner_id_set;
         LockStatus() : status(lock_status::UNKNOWN) {}
     };
 }
