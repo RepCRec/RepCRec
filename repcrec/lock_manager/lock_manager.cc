@@ -3,19 +3,20 @@
 //
 
 #include "lock_manager.h"
-#include "transaction_manager.h"
 
-repcrec::LockStatus LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_id, repcrec::var_id_t var_id) {
-    std::shared_ptr<SiteManager> site_manager = TransactionManager::get_instance().get_site_manager();
+#include "../transaction_manager/transaction_manager.h"
+
+repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_id, repcrec::var_id_t var_id) {
+    std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     repcrec::LockStatus lock_status;
     if ((var_id & 0x01) == 1) {
         repcrec::site_id_t site_id = 1 + (var_id) % 10;
-        std::shared_ptr<Site> site = site_manager->get_site(site_id);
-        if (!site->is_available()) {
+        std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
+        if (!site->is_write_available()) {
             lock_status.status = repcrec::lock_status::SITE_UNAVAILABLE;
             return lock_status;
         }
-        std::shared_ptr<Variable> var = site->get_variable(var_id);
+        std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
         if (var != nullptr and (var->has_exclusive_lock_exclude_self(tran_id) or var->has_shared_lock_exclude_self(tran_id))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             if (var->has_exclusive_lock_exclude_self(tran_id)) {
@@ -38,10 +39,10 @@ repcrec::LockStatus LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_
     }
 
     for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
-        if (!site_manager->get_site(sid)->is_available()) {
+        if (!site_manager->get_site(sid)->is_write_available()) {
             continue;
         }
-        std::shared_ptr<Variable> var = site_manager->get_site(sid)->get_variable(var_id);
+        std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(var_id);
         if (var != nullptr and (var->has_shared_lock_exclude_self(tran_id) or var->has_exclusive_lock_exclude_self(tran_id))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             lock_status.site_id_set.clear();
@@ -66,17 +67,17 @@ repcrec::LockStatus LockManager::try_acquire_write_lock(repcrec::tran_id_t tran_
     return lock_status;
 }
 
-repcrec::LockStatus LockManager::try_acquire_read_lock(repcrec::tran_id_t tran_id, repcrec::var_id_t var_id) {
-    std::shared_ptr<SiteManager> site_manager = TransactionManager::get_instance().get_site_manager();
+repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_read_lock(repcrec::tran_id_t tran_id, repcrec::var_id_t var_id) {
+    std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     repcrec::LockStatus lock_status;
     if ((var_id & 0x01) == 1) {
         repcrec::site_id_t site_id = 1 + (var_id) % 10;
-        std::shared_ptr<Site> site = site_manager->get_site(site_id);
-        if (!site->is_available()) {
+        std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
+        if (!site->is_read_available()) {
             lock_status.status = repcrec::lock_status::SITE_UNAVAILABLE;
             return lock_status;
         }
-        std::shared_ptr<Variable> var = site->get_variable(var_id);
+        std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
         if (var->has_exclusive_lock_exclude_self(tran_id)) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             return lock_status;
@@ -91,10 +92,10 @@ repcrec::LockStatus LockManager::try_acquire_read_lock(repcrec::tran_id_t tran_i
     }
 
     for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
-        if (!site_manager->get_site(sid)->is_available()) {
+        if (!site_manager->get_site(sid)->is_read_available()) {
             continue;
         }
-        std::shared_ptr<Variable> var = site_manager->get_site(sid)->get_variable(var_id);
+        std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(var_id);
         if (var->has_exclusive_lock_exclude_self(tran_id)) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             lock_status.site_id_set.clear();
@@ -111,12 +112,12 @@ repcrec::LockStatus LockManager::try_acquire_read_lock(repcrec::tran_id_t tran_i
     return lock_status;
 }
 
-void LockManager::release_locks(repcrec::tran_id_t tran_id) {
-    std::shared_ptr<SiteManager> site_manager = TransactionManager::get_instance().get_site_manager();
+void repcrec::lock_manager::LockManager::release_locks(repcrec::tran_id_t tran_id) {
+    std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     for (const repcrec::var_id_t& vid : lock_table_[tran_id]) {
         if ((vid & 0x01) == 1) {
             repcrec::site_id_t site_index = 1 + (vid % 10);
-            std::shared_ptr<Variable> var = site_manager->get_site(site_index)->get_variable(vid);
+            std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(site_index)->get_variable(vid);
             if (var->has_exclusive_lock(tran_id)) {
                 var->remove_exclusive_owner();
             }
@@ -125,7 +126,7 @@ void LockManager::release_locks(repcrec::tran_id_t tran_id) {
             }
         } else {
             for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
-                std::shared_ptr<Variable> var = site_manager->get_site(sid)->get_variable(vid);
+                std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(vid);
                 if (var->has_exclusive_lock(tran_id)) {
                     var->remove_exclusive_owner();
                 }
@@ -149,51 +150,43 @@ void LockManager::release_locks(repcrec::tran_id_t tran_id) {
     }
     wait_for_graph_.erase(tran_id);
     lock_table_.erase(tran_id);
-    printf("INFO: T%d releases all its locks.\n", tran_id);
+    // printf("INFO: T%d releases all its locks.\n", tran_id);
 }
 
-void LockManager::assign_write_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id) {
-    std::shared_ptr<SiteManager> site_manager = TransactionManager::get_instance().get_site_manager();
+void repcrec::lock_manager::LockManager::assign_write_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id) {
+    std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     for (const repcrec::site_id_t site_id : site_id_set) {
-        std::shared_ptr<Site> site = site_manager->get_site(site_id);
-        if (site->is_available()) {
-            std::shared_ptr<Variable> var = site->get_variable(var_id);
-            var->set_exclusive_transaction(TransactionManager::get_instance().get_transaction(tran_id));
+        std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
+        if (site->is_write_available()) {
+            std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
+            var->set_exclusive_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
             lock_table_[tran_id].insert(var_id);
         }
     }
 }
 
-void LockManager::assign_share_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id) {
-    std::shared_ptr<SiteManager> site_manager = TransactionManager::get_instance().get_site_manager();
+void repcrec::lock_manager::LockManager::assign_share_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id) {
+    std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     for (const repcrec::site_id_t site_id : site_id_set) {
-        std::shared_ptr<Site> site = site_manager->get_site(site_id);
-        if (site->is_available()) {
-            std::shared_ptr<Variable> var = site->get_variable(var_id);
-            var->add_shared_transaction(TransactionManager::get_instance().get_transaction(tran_id));
+        std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
+        if (site->is_read_available()) {
+            std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
+            var->add_shared_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
         }
     }
 }
 
-void LockManager::assign_wait_for_graph(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& owner_ids) {
+void repcrec::lock_manager::LockManager::assign_wait_for_graph(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& owner_ids) {
     for (const repcrec::tran_id_t& owner_id : owner_ids) {
         wait_for_graph_[tran_id].insert(owner_id);
     }
 }
 
-bool LockManager::is_waiting_for_lock(repcrec::tran_id_t tran_id) const {
+bool repcrec::lock_manager::LockManager::is_waiting_for_lock(repcrec::tran_id_t tran_id) const {
     return wait_for_graph_.contains(tran_id);
 }
 
-bool LockManager::detect_deadlock() {
-//    for (const auto& [x, ys] : wait_for_graph_) {
-//        printf("%d: ", x);
-//        for (const auto& y : ys) {
-//            printf("%d ", y);
-//        }
-//        printf("\n");
-//    }
-
+bool repcrec::lock_manager::LockManager::detect_deadlock() {
     std::unordered_map<repcrec::tran_id_t, dfs_status> visited;
     std::vector<repcrec::tran_id_t> tran_set;
     for (const auto& [curr_tran_id, _] : wait_for_graph_) {
@@ -212,7 +205,7 @@ bool LockManager::detect_deadlock() {
     return false;
 }
 
-void LockManager::wait_for_graph_dfs(repcrec::tran_id_t curr_tran_id, bool& has_cycle, std::unordered_map<repcrec::tran_id_t, dfs_status>& visited) {
+void repcrec::lock_manager::LockManager::wait_for_graph_dfs(repcrec::tran_id_t curr_tran_id, bool& has_cycle, std::unordered_map<repcrec::tran_id_t, dfs_status>& visited) {
     if (visited[curr_tran_id] == dfs_status::VISITED or has_cycle) {
         return;
     }

@@ -3,4 +3,4 @@ project(RepCRec)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(RepCRec src/main.cpp src/transaction_manager.cc src/transaction_manager.h src/site_manager.cc src/site_manager.h src/transaction.cc src/transaction.h src/instruction.cc src/instruction.h src/site.h src/site.cc src/variable.h src/variable.cc src/lock_manager.cc src/lock_manager.h src/request.h src/request.cc src/global.h src/utils.h)
+add_executable(RepCRec main.cpp repcrec/transaction_manager/transaction_manager.cc repcrec/transaction_manager/transaction_manager.h repcrec/site_manager/site_manager.cc repcrec/site_manager/site_manager.h repcrec/transaction/transaction.cc repcrec/transaction/transaction.h repcrec/instruction/instruction.cc repcrec/instruction/instruction.h repcrec/site/site.h repcrec/site/site.cc repcrec/variable/variable.h repcrec/variable/variable.cc repcrec/lock_manager/lock_manager.cc repcrec/lock_manager/lock_manager.h repcrec/request/request.h repcrec/request/request.cc repcrec/global.h)
