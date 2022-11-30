@@ -71,7 +71,7 @@ void repcrec::request::WriteRequest::exec() {
                 break;
             }
             case repcrec::lock_status::HAS_WRITE_LOCK: {
-                // printf("INFO: T%d already has write lock on x%d\n", tran_id_, var_id_);
+                // printf("INFO: T%d already has exclusive lock on x%d\n", tran_id_, var_id_);
                 for (const repcrec::site_id_t site_id : site_id_set) {
                     std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
                     repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id_)->update_values(site_id, var_id_, value_);
@@ -95,7 +95,8 @@ void repcrec::request::WriteRequest::exec() {
 }
 
 // Read
-repcrec::request::ReadRequest::ReadRequest(repcrec::timestamp_t timestamp, repcrec::tran_id_t tran_id, repcrec::var_id_t var_id) : Request(timestamp, tran_id, -1, var_id) {}
+repcrec::request::ReadRequest::ReadRequest(repcrec::timestamp_t timestamp, repcrec::tran_id_t tran_id, repcrec::var_id_t var_id)
+    : Request(timestamp, tran_id, -1, var_id) {}
 
 void repcrec::request::ReadRequest::exec() {
     if (repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id_)->is_read_only()) {
@@ -114,7 +115,13 @@ void repcrec::request::ReadRequest::handle_read_only_request() {
         if (site->is_read_available()) {
             printf("INFO(RO): T%d reads x%d=%d at site%d\n", tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
             transaction->add_read_history(site_id, var_id_, site->get_variable(var_id_)->get_value());
-            return;
+        } else {
+            // Transaction must wait for the site.
+            if (!repcrec::transaction_manager::TransactionManager::get_instance().is_transaction_waiting_for_site(tran_id_)) {
+                transaction->set_waiting_var_id(var_id_);
+                repcrec::transaction_manager::TransactionManager::get_instance().add_to_site_waiting_map(tran_id_, site_id);
+            }
+            repcrec::transaction_manager::TransactionManager::get_instance().add_request_to_blocked_queue(std::make_shared<ReadRequest>(timestamp_, tran_id_, var_id_));
         }
     } else {
         for (repcrec::site_id_t site_id = 1; site_id <= repcrec::SITE_COUNT; ++site_id) {
@@ -125,8 +132,9 @@ void repcrec::request::ReadRequest::handle_read_only_request() {
                 return;
             }
         }
+        // Transaction abort when all sites are down.
+        repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(tran_id_);
     }
-    repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(tran_id_);
 }
 
 void repcrec::request::ReadRequest::handle_read_request() {
@@ -165,11 +173,16 @@ void repcrec::request::ReadRequest::handle_read_request() {
                 }
             }
         } else {
-            repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id_)->set_waiting_var_id(var_id_);
+            if (!repcrec::transaction_manager::TransactionManager::get_instance().is_transaction_waiting_for_site(tran_id_)) {
+                transaction->set_waiting_var_id(var_id_);
+                repcrec::transaction_manager::TransactionManager::get_instance().add_to_site_waiting_map(tran_id_, site_id);
+            }
+            repcrec::transaction_manager::TransactionManager::get_instance().add_request_to_blocked_queue(std::make_shared<ReadRequest>(timestamp_, tran_id_, var_id_));
         }
     } else {
         auto [site_id_set, status, owner_ids] = lock_manager->try_acquire_read_lock(tran_id_, var_id_);
         if (site_id_set.empty()) {
+            // Transaction should abort when all sites are unavailable.
             repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(tran_id_);
         }
         switch (status) {
@@ -256,5 +269,6 @@ repcrec::request::RecoveryRequest::RecoveryRequest(repcrec::timestamp_t timestam
 void repcrec::request::RecoveryRequest::exec() {
     std::shared_ptr<repcrec::site_manager::SiteManager> site_manager_ = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     site_manager_->get_site(site_id_)->set_write_available();
+    repcrec::transaction_manager::TransactionManager::get_instance().remove_from_site_waiting_map(site_id_);
     printf("INFO (%d): Site-%d has been recovered.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, site_id_);
 }

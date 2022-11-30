@@ -1,5 +1,5 @@
 //
-// Created by 梁俊华 on 11/21/22.
+// Created by Junhua Liang on 11/21/22.
 //
 
 #ifndef REPCREC_TRANSACTION_MANAGER_H
@@ -45,12 +45,14 @@ namespace repcrec::transaction_manager {
         void add_instruction(const std::shared_ptr<repcrec::instruction::Instruction>& insr, repcrec::timestamp_t timestamp);
         void add_transaction(repcrec::tran_id_t tran_id, const std::shared_ptr<repcrec::transaction::Transaction>& transaction);
         void add_request_to_blocked_queue(const std::shared_ptr<repcrec::request::Request>& request);
-        void remove_from_variables_waiting_map(repcrec::tran_id_t tran_id); // TODO
+        void add_to_site_waiting_map(repcrec::tran_id_t, repcrec::site_id_t var_id);
+        void remove_from_site_waiting_map(repcrec::site_id_t site_id);
         void execute_instructions(repcrec::timestamp_t timestamp);
         void evict_transaction(repcrec::tran_id_t tran_id);
         void abort_transaction(repcrec::tran_id_t tran_id);
 
         [[nodiscard]] bool is_all_instructions_finished() const;
+        [[nodiscard]] bool is_transaction_waiting_for_site(repcrec::tran_id_t tran_id) const;
         [[nodiscard]] std::shared_ptr<repcrec::site_manager::SiteManager> get_site_manager() const;
         [[nodiscard]] std::shared_ptr<repcrec::transaction::Transaction> get_transaction(repcrec::tran_id_t tran_id) const;
         [[nodiscard]] std::shared_ptr<repcrec::lock_manager::LockManager> get_lock_manager() const;
@@ -64,10 +66,10 @@ namespace repcrec::transaction_manager {
         std::shared_ptr<repcrec::lock_manager::LockManager> lock_manager_;
         std::shared_ptr<repcrec::site_manager::SiteManager> site_manager_;
         std::set<std::shared_ptr<repcrec::transaction::Transaction>, tm_transaction_time_cmp> transactions_set_;
-        std::unordered_map<repcrec::tran_id_t, repcrec::var_id_t> variables_waiting_map_; // TODO: Solve waiting
+        std::unordered_map<repcrec::tran_id_t, repcrec::site_id_t> site_waiting_map_;
         std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> transactions_;
         std::unordered_map<repcrec::tran_id_t, std::set<std::shared_ptr<repcrec::request::Request>, tm_block_queue_cmp>> blocked_transactions_queue_;
     };
 }
 
-#endif//REPCREC_TRANSACTION_MANAGER_H
+#endif //REPCREC_TRANSACTION_MANAGER_H

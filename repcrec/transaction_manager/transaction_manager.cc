@@ -1,5 +1,5 @@
 //
-// Created by 梁俊华 on 11/21/22.
+// Created by Junhua Liang on 11/21/22.
 //
 
 #include "transaction_manager.h"
@@ -77,7 +77,9 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
 
     // When waiting, add to blocked queue
     if (request_ != nullptr
-        and (lock_manager_->is_waiting_for_lock(request_->get_transaction_id()) or blocked_transactions_queue_.contains(request_->get_transaction_id()))) {
+        and (lock_manager_->is_waiting_for_lock(request_->get_transaction_id())
+             or blocked_transactions_queue_.contains(request_->get_transaction_id())
+             or is_transaction_waiting_for_site(request_->get_transaction_id()))) {
         // printf("INFO: T%d instruction blocked!!!\n", request_->get_transaction_id());
         if (request_->get_type() == repcrec::instruction::InstructType::WRITE or request_->get_type() == repcrec::instruction::InstructType::READ) {
             // add_request_to_blocked_queue(request_); inside exec()
@@ -95,7 +97,7 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
 
     std::unordered_set<repcrec::tran_id_t> finished_set;
     for (const auto& [tran_id, request_set] : blocked_transactions_queue_) {
-        if (!lock_manager_->is_waiting_for_lock(tran_id)) {
+        if (!lock_manager_->is_waiting_for_lock(tran_id) and !is_transaction_waiting_for_site(tran_id)) {
             finished_set.insert(tran_id);
             for (const auto & iter : request_set) {
                 iter->exec();
@@ -146,7 +148,22 @@ void repcrec::transaction_manager::TransactionManager::abort_transaction(repcrec
     printf("INFO (%d): Abort transaction T%d\n", curr_timestamp, tran_id);
 }
 
-// TODO
-void repcrec::transaction_manager::TransactionManager::remove_from_variables_waiting_map(repcrec::tran_id_t tran_id) {
-    variables_waiting_map_.erase(tran_id);
+void repcrec::transaction_manager::TransactionManager::add_to_site_waiting_map(repcrec::tran_id_t tran_id, repcrec::site_id_t var_id) {
+    site_waiting_map_[tran_id] = var_id;
+}
+
+void repcrec::transaction_manager::TransactionManager::remove_from_site_waiting_map(repcrec::site_id_t site_id) {
+    std::unordered_set<repcrec::tran_id_t> unblocked_tran_id_set;
+    for (const auto& [tid, sid] : site_waiting_map_) {
+        if (sid == site_id) {
+            unblocked_tran_id_set.insert(tid);
+        }
+    }
+    for (const repcrec::tran_id_t& tid : unblocked_tran_id_set) {
+        site_waiting_map_.erase(tid);
+    }
+}
+
+bool repcrec::transaction_manager::TransactionManager::is_transaction_waiting_for_site(repcrec::tran_id_t tran_id) const {
+    return site_waiting_map_.contains(tran_id);
 }

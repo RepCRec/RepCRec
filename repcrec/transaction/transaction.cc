@@ -40,7 +40,7 @@ bool repcrec::transaction::Transaction::commit(repcrec::timestamp_t commit_time)
         for (const auto& [var_id, var] : var_set) {
             site->assign_var(var_id, var, commit_time);
             site->set_read_available();
-            repcrec::transaction_manager::TransactionManager::get_instance().remove_from_variables_waiting_map(transaction_id_);
+
         }
     }
     return true;
@@ -57,7 +57,7 @@ void repcrec::transaction::Transaction::add_read_history(repcrec::site_id_t site
     read_accessed_sites_[site_id][var_id] = var;
 }
 
-repcrec::var_id_t repcrec::transaction::Transaction::get_waiting_var_id() {
+repcrec::var_id_t repcrec::transaction::Transaction::get_waiting_var_id() const {
     return waiting_var_id_;
 }
 

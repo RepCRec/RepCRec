@@ -21,7 +21,7 @@ namespace repcrec::transaction {
         [[nodiscard]] repcrec::tran_id_t get_transaction_id() const;
         [[nodiscard]] bool is_read_only() const;
         [[nodiscard]] repcrec::timestamp_t get_timestamp() const;
-        [[nodiscard]] repcrec::var_id_t get_waiting_var_id();
+        [[nodiscard]] repcrec::var_id_t get_waiting_var_id() const;
 
         bool commit(repcrec::timestamp_t commit_time);
         void update_values(repcrec::site_id_t site_id, repcrec::var_id_t var_id, repcrec::var_t var);
