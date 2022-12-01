@@ -8,10 +8,17 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include "repcrec/transaction_manager/transaction_manager.h"
 using namespace repcrec::transaction_manager;
 using namespace repcrec::instruction;
+using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
+using std::endl;
+using std::cout;
+using std::string;
+
+
 static std::string inputFilePath = "../test/input/";
 static std::string resultFilePath = "../test/output/";
 static std::string outputFilePath = "../test/";
@@ -43,6 +50,44 @@ void execute_advanced_database(const std::string_view &file_name, const std::str
     // extra dump
     TransactionManager::get_instance().add_instruction(std::make_shared<Instruction>("dump()"), TransactionManager::curr_timestamp++);
     TransactionManager::get_instance().execute_instructions(TransactionManager::curr_timestamp);
+
+    if(mode == "test"){
+        outFile->close();
+    }
+}
+
+void execute_test_case_check(){
+    int all = 0;
+    int right = 0;
+    for (const auto& dirEntry : recursive_directory_iterator(resultFilePath)){
+        if(dirEntry.is_directory()){
+            continue;
+        }
+        all++;
+        const string fileName = dirEntry.path().filename();
+        cout<<"Test case: "<<fileName<<endl;
+
+        std::ifstream resultFile(resultFilePath + fileName);
+        std::ifstream outputFile(outputFilePath + fileName);
+        string resultLine;
+        string outputLine;
+        while(std::getline(resultFile,resultLine) && std::getline(outputFile,outputLine)){
+            if(resultLine != outputLine){
+                cout<<"\033[1;31mWrong Line\033[0m"<<endl;
+                cout<<"Result: "<<resultLine<<endl;
+                cout<<"Your output: "<<outputLine<<endl;
+                break;
+            }
+        }
+        if(resultLine==outputLine){
+            cout<<"\033[1;32mPass\033[0m"<<endl;
+            right ++;
+        }
+        resultFile.close();
+        outputFile.close();
+    }
+
+    cout<<right<<" / "<<all <<" pass"<<endl;
 }
 
 int main(int argc, char **argv) {
@@ -50,5 +95,8 @@ int main(int argc, char **argv) {
         throw std::invalid_argument("Please specify your testing file.\n");
     }
     execute_advanced_database(argv[2],argv[1]);
+    if(string(argv[1]) == "test"){
+        execute_test_case_check();
+    }
     return 0;
 }
