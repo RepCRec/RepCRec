@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/25/22.
-//
+/**
+ * @brief       RepCRec database system project.
+ * @copyright   New York University.
+ * @authors     Junhua Liang, Guanqun Yang.
+ * @date        2022-12-02.
+ */
 
 #ifndef REPCREC_REQUEST_H
 #define REPCREC_REQUEST_H
@@ -97,6 +100,6 @@ namespace repcrec::request {
 
         void exec() override;
     };
-}
+} // namespace repcrec::request.
 
-#endif//REPCREC_REQUEST_H
+#endif //REPCREC_REQUEST_H

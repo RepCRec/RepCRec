@@ -1,7 +1,6 @@
 # RepCRec Design Document
 
 > Team Member
->
 > - Junhua Liang
 > - Guanqun Yang
 >
@@ -27,7 +26,7 @@ The design for this project contains 8 components. They will be structured toget
 
 #### Design Diagram
 
-![design-diagram](./docs/design-diagram.png)
+![design-diagram](design-diagram.png)
 
 #### Component Logic
 

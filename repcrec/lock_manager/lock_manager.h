@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/25/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #ifndef REPCREC_LOCK_MANAGER_H
 #define REPCREC_LOCK_MANAGER_H
@@ -40,9 +43,7 @@ namespace repcrec::lock_manager {
 
         void wait_for_graph_dfs(repcrec::tran_id_t curr_tran_id, bool& has_cycle, std::unordered_map<repcrec::tran_id_t, dfs_status>& visited);
     };
-}
+} // namespace repcrec::lock_manager.
 
-
-
-#endif//REPCREC_LOCK_MANAGER_H
+#endif //REPCREC_LOCK_MANAGER_H
 

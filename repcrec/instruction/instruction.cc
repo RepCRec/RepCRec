@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/21/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #include "instruction.h"
 

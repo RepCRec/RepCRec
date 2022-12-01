@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/21/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #ifndef REPCREC_INSTRUCTION_H
 #define REPCREC_INSTRUCTION_H
@@ -44,6 +47,6 @@ namespace repcrec::instruction {
 
         static int initial_id_;
     };
-}
+} // namespace repcrec::instruction.
 
-#endif//REPCREC_INSTRUCTION_H
+#endif //REPCREC_INSTRUCTION_H

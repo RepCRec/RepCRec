@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/23/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #ifndef REPCREC_VARIABLE_H
 #define REPCREC_VARIABLE_H
@@ -43,6 +46,6 @@ namespace repcrec::variable {
         std::shared_ptr<repcrec::transaction::Transaction> exclusive_lock_owner_;
         std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> shared_lock_owners_;
     };
-}
+} // repcrec::variable
 
 #endif//REPCREC_VARIABLE_H

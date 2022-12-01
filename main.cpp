@@ -1,6 +1,9 @@
-//
-// Created by Junhua Liang on 11/25/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #include <fstream>
 #include <iostream>
@@ -24,7 +27,7 @@ void execute_advanced_database(const std::string_view &file_name, const std::str
 
     std::string insr;
     while (getline(insr_file, insr)) {
-        // printf("INFO: Start executing %s\n", insr.c_str());
+        // Skip dump and execute it after finishing all instructions.
         if (insr.starts_with("dump")) {
             continue;
         }
