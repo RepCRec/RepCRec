@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/21/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #ifndef REPCREC_TRANSACTION_H
 #define REPCREC_TRANSACTION_H
@@ -37,6 +40,6 @@ namespace repcrec::transaction {
         std::unordered_map<repcrec::site_id_t, std::unordered_map<repcrec::var_id_t, repcrec::var_t>> read_accessed_sites_;
         std::unordered_map<repcrec::site_id_t, std::unordered_map<repcrec::var_id_t, repcrec::var_t>> write_accessed_sites_;
     };
-} // namespace repcrec
+} // namespace repcrec::transaction.
 
 #endif//REPCREC_TRANSACTION_H

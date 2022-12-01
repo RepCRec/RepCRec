@@ -1,6 +1,9 @@
-//
-// Created by 梁俊华 on 11/21/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #include "site_manager.h"
 
@@ -16,7 +19,7 @@ void repcrec::site_manager::SiteManager::dump() const {
     }
 }
 
-std::shared_ptr<repcrec::site::Site> repcrec::site_manager::SiteManager::get_site(int site_id) {
+std::shared_ptr<repcrec::site::Site> repcrec::site_manager::SiteManager::get_site(repcrec::site_id_t site_id) {
     return sites_[site_id];
 }
 

@@ -1,6 +1,9 @@
-//
-// Created by Junhua Liang on 11/21/22.
-//
+/**
+* @brief       RepCRec database system project.
+* @copyright   New York University.
+* @authors     Junhua Liang, Guanqun Yang.
+* @date        2022-12-02.
+*/
 
 #ifndef REPCREC_TRANSACTION_MANAGER_H
 #define REPCREC_TRANSACTION_MANAGER_H
@@ -70,6 +73,6 @@ namespace repcrec::transaction_manager {
         std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> transactions_;
         std::unordered_map<repcrec::tran_id_t, std::set<std::shared_ptr<repcrec::request::Request>, tm_block_queue_cmp>> blocked_transactions_queue_;
     };
-}
+} // namespace repcrec::transaction_manager.
 
 #endif //REPCREC_TRANSACTION_MANAGER_H
