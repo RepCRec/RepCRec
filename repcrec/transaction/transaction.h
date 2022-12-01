@@ -26,6 +26,12 @@ namespace repcrec::transaction {
         [[nodiscard]] repcrec::timestamp_t get_timestamp() const;
         [[nodiscard]] repcrec::var_id_t get_waiting_var_id() const;
 
+        /**
+         * When the transaction commits, it will first check whether all the sites it visited before are available.
+         * Then it will update all its write results into the variables at that site.
+         * @param commit_time The timestamp the transaction commits.
+         * @return True if the transaction commits successfully, False if fails.
+         */
         bool commit(repcrec::timestamp_t commit_time);
         void update_values(repcrec::site_id_t site_id, repcrec::var_id_t var_id, repcrec::var_t var);
         void add_read_history(repcrec::site_id_t site_id, repcrec::var_id_t var_id, repcrec::var_t var);
