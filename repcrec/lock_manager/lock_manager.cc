@@ -95,7 +95,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_read_lock(re
     }
 
     for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
-        if (!site_manager->get_site(sid)->is_read_available(var_id)) {
+        if (!site_manager->get_site(sid)->is_write_available()) {
             continue;
         }
         std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(var_id);
