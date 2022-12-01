@@ -10,14 +10,14 @@
 repcrec::site_id_t repcrec::site::Site::increase_id_ = 1;
 std::shared_ptr<std::ofstream> repcrec::site::Site::write_to_file_= nullptr;
 
-repcrec::site::Site::Site() : id_(increase_id_++), read_available_(true), write_available_(true) {
+repcrec::site::Site::Site() : id_(increase_id_++), write_available_(true) {
     for (repcrec::var_id_t var_id = 1; var_id <= repcrec::VAR_COUNT; ++var_id) {
         variables_[var_id] = std::make_shared<repcrec::variable::Variable>(var_id);
     }
 }
 
-bool repcrec::site::Site::is_read_available() const {
-    return read_available_;
+bool repcrec::site::Site::is_read_available(repcrec::var_id_t var_id) {
+    return read_available_map_[var_id];
 }
 
 bool repcrec::site::Site::is_write_available() const {
@@ -69,12 +69,14 @@ void repcrec::site::Site::assign_var(repcrec::var_id_t var_id, repcrec::var_t va
 }
 
 void repcrec::site::Site::set_unavailable() {
-    read_available_ = false;
+    for (repcrec::var_id_t var_id = 1; var_id <= repcrec::VAR_COUNT; ++var_id) {
+        read_available_map_[var_id] = false;
+    }
     write_available_ = false;
 }
 
-void repcrec::site::Site::set_read_available() {
-    read_available_ = true;
+void repcrec::site::Site::set_read_available(repcrec::var_id_t var_id) {
+    read_available_map_[var_id] = true;
 }
 
 void repcrec::site::Site::set_write_available() {
