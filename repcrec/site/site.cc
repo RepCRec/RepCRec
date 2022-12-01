@@ -4,6 +4,7 @@
 #include "site.h"
 
 repcrec::site_id_t repcrec::site::Site::increase_id_ = 1;
+std::shared_ptr<std::ofstream> repcrec::site::Site::write_to_file_= nullptr;
 
 repcrec::site::Site::Site() : id_(increase_id_++), read_available_(true), write_available_(true) {
     for (repcrec::var_id_t var_id = 1; var_id <= repcrec::VAR_COUNT; ++var_id) {
@@ -24,12 +25,32 @@ repcrec::site_id_t repcrec::site::Site::get_site_id() const {
 }
 
 void repcrec::site::Site::dump() const {
-    printf("site %2d - ", id_);
+    if(!use_file()) {
+        printf("site %2d - ", id_);
+    }else{
+        (*write_to_file_)<<"site"<<std::setw(2)<<id_<<" - ";
+    };
     for (auto iter = variables_.begin(); iter != variables_.end(); ++iter) {
+        if(iter->second->get_id() % 2 == 1 && id_ != iter->second->get_id() % 10 + 1){
+            if(!use_file()){
+                printf("         \t");
+            }else{
+                (*write_to_file_)<<"         \t";
+            }
+            continue;
+        }
         if (iter == prev(end(variables_))) {
-            printf("x%d: %d\n", iter->second->get_id(), iter->second->get_value());
+            if(!use_file()) {
+                printf("x%2d:%5d\n", iter->second->get_id(), iter->second->get_value());
+            }else{
+                (*write_to_file_)<<"x"<<std::setw(2)<<iter->second->get_id()<<":"<<std::setw(5)<<iter->second->get_value()<<"\n";
+            }
         } else {
-            printf("x%d: %d\t", iter->second->get_id(), iter->second->get_value());
+            if(!use_file()){
+                printf("x%2d:%5d\t", iter->second->get_id(), iter->second->get_value());
+            }else{
+                (*write_to_file_)<<"x"<<std::setw(2)<<iter->second->get_id()<<":"<<std::setw(5)<<iter->second->get_value()<<"\t";
+            }
         }
     }
 }

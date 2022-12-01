@@ -249,9 +249,7 @@ void repcrec::request::EndTransactionRequest::exec() {
 repcrec::request::DumpRequest::DumpRequest(repcrec::timestamp_t timestamp) : Request(timestamp) {}
 
 void repcrec::request::DumpRequest::exec() {
-    printf("====================================================\n");
     repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager()->dump();
-    printf("====================================================\n");
 }
 
 // Fail

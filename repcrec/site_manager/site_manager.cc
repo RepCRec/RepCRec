@@ -4,6 +4,8 @@
 
 #include "site_manager.h"
 
+std::shared_ptr<std::ofstream> repcrec::site_manager::SiteManager::write_to_file_= nullptr;
+
 repcrec::site_manager::SiteManager::SiteManager() {
     for (int i = 1; i <= 10 ; ++i) {
         sites_[i] = std::make_unique<repcrec::site::Site>();
@@ -11,8 +13,18 @@ repcrec::site_manager::SiteManager::SiteManager() {
 }
 
 void repcrec::site_manager::SiteManager::dump() const {
+    if(use_file()){
+        (*write_to_file_)<<"====================================================\n";
+    }else{
+        printf("====================================================\n");
+    }
     for (const auto& [_, site] : sites_) {
         site->dump();
+    }
+    if(use_file()){
+        (*write_to_file_)<<"====================================================\n";
+    }else {
+        printf("====================================================\n");
     }
 }
 

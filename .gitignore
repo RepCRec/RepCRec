@@ -1,5 +1,6 @@
 .idea/
 .vscode/
+test/Test*
 
 # CMake
 cmake-build-debug/

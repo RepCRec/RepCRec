@@ -4,6 +4,7 @@
 #ifndef REPCREC_SITE_H
 #define REPCREC_SITE_H
 
+#include <fstream>
 #include <map>
 #include <memory>
 
@@ -15,6 +16,14 @@ namespace repcrec::site {
     public:
         Site();
         ~Site() = default;
+
+        static void set_file(const std::shared_ptr<std::ofstream> &file) {
+            write_to_file_ = file;
+        }
+
+        static bool use_file() {
+            return write_to_file_ != nullptr;
+        }
 
         [[nodiscard]] bool is_read_available() const;
         [[nodiscard]] bool is_write_available() const;
@@ -34,7 +43,8 @@ namespace repcrec::site {
         bool read_available_;
         std::map<repcrec::var_id_t, std::shared_ptr<repcrec::variable::Variable>> variables_;
         static repcrec::site_id_t increase_id_;
+        static std::shared_ptr<std::ofstream> write_to_file_;
     };
-}
+}// namespace repcrec::site
 
-#endif // REPCREC_SITE_H
+#endif// REPCREC_SITE_H
