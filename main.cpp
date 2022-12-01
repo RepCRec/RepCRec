@@ -23,15 +23,21 @@ static std::string inputFilePath = "./test/input/";
 static std::string resultFilePath = "./test/output/";
 static std::string outputFilePath = "./test/";
 
-void execute_test_case_check() {
-    int all = 0;
+void execute_test_case_check(const string &mode) {
+    std::vector<std::string> fileNames;
     int right = 0;
-    for (const auto &dirEntry: recursive_directory_iterator(resultFilePath)) {
-        if (dirEntry.is_directory()) {
-            continue;
+    if (mode == "all") {
+        for (const auto &dirEntry: recursive_directory_iterator(resultFilePath)) {
+            if (dirEntry.is_directory()) {
+                continue;
+            }
+            fileNames.push_back(dirEntry.path().filename());
         }
-        all++;
-        const string fileName = dirEntry.path().filename();
+    } else {
+        fileNames.push_back(mode);
+    }
+
+    for (auto &fileName: fileNames) {
         cout << "Test case: " << fileName << endl;
 
         std::ifstream resultFile(resultFilePath + fileName);
@@ -54,7 +60,7 @@ void execute_test_case_check() {
         outputFile.close();
     }
 
-    cout << right << " / " << all << " pass" << endl;
+    cout << right << " / " << fileNames.size() << " pass" << endl;
 }
 
 void execute_advanced_database(const std::string_view &file_name, const std::string &mode) {
@@ -97,8 +103,8 @@ int main(int argc, char **argv) {
     }
     if (string(argv[2]) == "all") {
         for (const auto &dirEntry: recursive_directory_iterator(inputFilePath)) {
-            cout<<"---------------------------------------------------"<<endl;
-            cout<<"start "<<dirEntry.path().filename()<<endl;
+            cout << "---------------------------------------------------" << endl;
+            cout << "start " << dirEntry.path().filename() << endl;
             auto pid = fork();
             if (pid == 0) {
                 execute_advanced_database(string(dirEntry.path().filename()), "test");
@@ -111,22 +117,20 @@ int main(int argc, char **argv) {
                         if (errno == ECHILD) break;
                     } else {
                         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                            std::cerr << dirEntry.path().filename()  << " failed" << endl;
+                            std::cerr << dirEntry.path().filename() << " failed" << endl;
                             break;
                         }
                     }
                 }
             }
         }
-        if (string(argv[1]) == "test") {
-            execute_test_case_check();
-        }
+
+        execute_test_case_check("all");
+
         return 0;
     } else {
         execute_advanced_database(argv[2], argv[1]);
-        if (string(argv[1]) == "test") {
-            execute_test_case_check();
-        }
+        execute_test_case_check(argv[2]);
     }
     return 0;
 }
