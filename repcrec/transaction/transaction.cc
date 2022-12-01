@@ -31,10 +31,12 @@ bool repcrec::transaction::Transaction::commit(repcrec::timestamp_t commit_time)
             return false;
         }
     }
-    for (const auto& [site_id, _] : read_accessed_sites_) {
-        if (!site_manager->get_site(site_id)->is_read_available()) {
-            repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(transaction_id_);
-            return false;
+    for (const auto& [site_id, var_set] : read_accessed_sites_) {
+        for (const auto& [var_id, var] : var_set) {
+            if (!site_manager->get_site(site_id)->is_read_available(var_id)) {
+                repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(transaction_id_);
+                return false;
+            }
         }
     }
     // TODO: Solve waiting
@@ -42,8 +44,7 @@ bool repcrec::transaction::Transaction::commit(repcrec::timestamp_t commit_time)
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
         for (const auto& [var_id, var] : var_set) {
             site->assign_var(var_id, var, commit_time);
-            site->set_read_available();
-
+            site->set_read_available(var_id);
         }
     }
     return true;

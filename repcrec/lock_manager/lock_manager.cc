@@ -76,7 +76,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_read_lock(re
     if ((var_id & 0x01) == 1) {
         repcrec::site_id_t site_id = 1 + (var_id) % 10;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-        if (!site->is_read_available()) {
+        if (!site->is_read_available(var_id)) {
             lock_status.status = repcrec::lock_status::SITE_UNAVAILABLE;
             return lock_status;
         }
@@ -95,7 +95,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_read_lock(re
     }
 
     for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
-        if (!site_manager->get_site(sid)->is_read_available()) {
+        if (!site_manager->get_site(sid)->is_read_available(var_id)) {
             continue;
         }
         std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(var_id);
@@ -172,7 +172,7 @@ void repcrec::lock_manager::LockManager::assign_share_lock(repcrec::tran_id_t tr
     std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     for (const repcrec::site_id_t site_id : site_id_set) {
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-        if (site->is_read_available()) {
+        if (site->is_read_available(var_id)) {
             std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
             var->add_shared_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
         }

@@ -115,7 +115,7 @@ void repcrec::request::ReadRequest::handle_read_only_request() {
     if ((var_id_ & 0x01) == 1) {
         repcrec::site_id_t site_id = 1 + var_id_ % 10;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-        if (site->is_read_available()) {
+        if (site->is_read_available(var_id_)) {
             printf("INFO(RO): T%d reads x%d=%d at site%d\n", tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
             transaction->add_read_history(site_id, var_id_, site->get_variable(var_id_)->get_value());
         } else {
@@ -129,7 +129,7 @@ void repcrec::request::ReadRequest::handle_read_only_request() {
     } else {
         for (repcrec::site_id_t site_id = 1; site_id <= repcrec::SITE_COUNT; ++site_id) {
             std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-            if (site->is_read_available()) {
+            if (site->is_read_available(var_id_)) {
                 printf("INFO(RO): T%d reads x%d=%d\n", tran_id_, var_id_, site->get_variable(var_id_)->get_value());
                 transaction->add_read_history(site_id, var_id_, site->get_variable(var_id_)->get_value());
                 return;
@@ -147,7 +147,7 @@ void repcrec::request::ReadRequest::handle_read_request() {
     if ((var_id_ % 0x01) == 1) {
         repcrec::site_id_t site_id = 1 + var_id_ % 10;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-        if (site->is_read_available()) {
+        if (site->is_read_available(var_id_)) {
             auto [site_id_set, status, owner_ids] = lock_manager->try_acquire_read_lock(tran_id_, var_id_);
             switch (status) {
                 case repcrec::lock_status::SITE_UNAVAILABLE: {
