@@ -13,6 +13,7 @@ std::shared_ptr<std::ofstream> repcrec::site::Site::write_to_file_= nullptr;
 repcrec::site::Site::Site() : id_(increase_id_++), write_available_(true) {
     for (repcrec::var_id_t var_id = 1; var_id <= repcrec::VAR_COUNT; ++var_id) {
         variables_[var_id] = std::make_shared<repcrec::variable::Variable>(var_id);
+        read_available_map_[var_id] = true;
     }
 }
 
