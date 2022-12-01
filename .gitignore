@@ -1,7 +1,16 @@
 .idea/
 .vscode/
 test/Test*
+Testing/
 
 # CMake
 cmake-build-debug/
 cmake-build-debug-event-trace/
+CMakeFiles/
+RepCRec.cbp
+RepCRecExec
+.cmake/
+.ninja*
+cmake_install.cmake
+CMakeCache.txt
+Makefile
