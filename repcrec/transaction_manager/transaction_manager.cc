@@ -140,7 +140,7 @@ std::shared_ptr<repcrec::lock_manager::LockManager> repcrec::transaction_manager
 }
 
 bool repcrec::transaction_manager::TransactionManager::is_all_instructions_finished() const {
-    return transactions_.empty();
+    return request_ == nullptr and blocked_transactions_queue_.empty();
 }
 
 void repcrec::transaction_manager::TransactionManager::abort_transaction(repcrec::tran_id_t tran_id) {
