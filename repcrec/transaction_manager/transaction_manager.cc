@@ -75,6 +75,7 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
         and request_->get_transaction_id() != -1
         and !transactions_.contains(request_->get_transaction_id())
         and !(request_->get_type() == repcrec::instruction::InstructType::BEGIN or request_->get_type() == repcrec::instruction::InstructType::BEGINO)) {
+        request_ = nullptr;
         return;
     }
 
@@ -169,4 +170,8 @@ void repcrec::transaction_manager::TransactionManager::remove_from_site_waiting_
 
 bool repcrec::transaction_manager::TransactionManager::is_transaction_waiting_for_site(repcrec::tran_id_t tran_id) const {
     return site_waiting_map_.contains(tran_id);
+}
+
+std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> repcrec::transaction_manager::TransactionManager::get_transactions() const {
+    return transactions_;
 }

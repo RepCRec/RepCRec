@@ -68,3 +68,7 @@ repcrec::var_id_t repcrec::transaction::Transaction::get_waiting_var_id() const 
 void repcrec::transaction::Transaction::set_waiting_var_id(repcrec::var_id_t var_id) {
     waiting_var_id_ = var_id;
 }
+
+bool repcrec::transaction::Transaction::is_written_into_site(repcrec::site_id_t site_id) {
+    return write_accessed_sites_.contains(site_id);
+}

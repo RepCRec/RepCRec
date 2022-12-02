@@ -20,7 +20,18 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
             return lock_status;
         }
         std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
-        if (var != nullptr and (var->has_exclusive_lock_exclude_self(tran_id) or var->has_shared_lock_exclude_self(tran_id))) {
+        if (var != nullptr
+            and var->has_shared_lock(tran_id)
+            and !var->has_shared_lock_exclude_self(tran_id)
+            and !var->has_shared_lock_exclude_self(tran_id)) {
+            lock_status.site_id_set.insert(site_id);
+            lock_status.status = repcrec::lock_status::HAS_READ_LOCK;
+            return lock_status;
+        }
+        if (var != nullptr and
+            (var->has_exclusive_lock_exclude_self(tran_id)
+             or var->has_shared_lock_exclude_self(tran_id)
+             or (var->has_shared_lock(tran_id)))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             if (var->has_exclusive_lock_exclude_self(tran_id)) {
                 lock_status.owner_id_set.insert(var->get_exclusive_lock_owner()->get_transaction_id());
@@ -29,6 +40,9 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
                 for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
                     lock_status.owner_id_set.insert(shared_owner_id);
                 }
+            }
+            if (var->has_shared_lock(tran_id)) {
+                lock_status.owner_id_set.insert(tran_id);
             }
             return lock_status;
         }
@@ -46,7 +60,18 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
             continue;
         }
         std::shared_ptr<repcrec::variable::Variable> var = site_manager->get_site(sid)->get_variable(var_id);
-        if (var != nullptr and (var->has_shared_lock_exclude_self(tran_id) or var->has_exclusive_lock_exclude_self(tran_id))) {
+        if (var != nullptr
+            and var->has_shared_lock(tran_id)
+            and !var->has_shared_lock_exclude_self(tran_id)
+            and !var->has_exclusive_lock_exclude_self(tran_id)) {
+            lock_status.status = repcrec::lock_status::HAS_READ_LOCK;
+            lock_status.site_id_set.insert(sid);
+            continue;
+        }
+        if (var != nullptr and
+            (var->has_shared_lock_exclude_self(tran_id)
+             or var->has_exclusive_lock_exclude_self(tran_id)
+             or var->has_shared_lock(tran_id))) {
             lock_status.status = repcrec::lock_status::NEED_TO_WAIT;
             lock_status.site_id_set.clear();
             if (var->has_exclusive_lock_exclude_self(tran_id)) {
@@ -56,6 +81,9 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
                 for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
                     lock_status.owner_id_set.insert(shared_owner_id);
                 }
+            }
+            if (var->has_shared_lock(tran_id)) {
+                lock_status.owner_id_set.insert(tran_id);
             }
             return lock_status;
         }
@@ -162,8 +190,12 @@ void repcrec::lock_manager::LockManager::assign_write_lock(repcrec::tran_id_t tr
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
         if (site->is_write_available()) {
             std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
+            if (var->has_shared_lock(tran_id)) {
+                var->remove_shared_owner(tran_id);
+            }
             var->set_exclusive_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
             lock_table_[tran_id].insert(var_id);
+            remove_self_from_wait_for_graph(tran_id);
         }
     }
 }
@@ -228,4 +260,13 @@ void repcrec::lock_manager::LockManager::wait_for_graph_dfs(repcrec::tran_id_t c
         }
     }
     visited[curr_tran_id] = dfs_status::VISITED;
+}
+
+void repcrec::lock_manager::LockManager::remove_self_from_wait_for_graph(repcrec::tran_id_t tran_id) {
+    if (wait_for_graph_.contains(tran_id) and wait_for_graph_[tran_id].contains(tran_id)) {
+        wait_for_graph_[tran_id].erase(tran_id);
+        if (wait_for_graph_[tran_id].empty()) {
+            wait_for_graph_.erase(tran_id);
+        }
+    }
 }

@@ -33,6 +33,7 @@ namespace repcrec::transaction {
          * @return True if the transaction commits successfully, False if fails.
          */
         bool commit(repcrec::timestamp_t commit_time);
+        bool is_written_into_site(repcrec::site_id_t);
         void update_values(repcrec::site_id_t site_id, repcrec::var_id_t var_id, repcrec::var_t var);
         void add_read_history(repcrec::site_id_t site_id, repcrec::var_id_t var_id, repcrec::var_t var);
         void set_waiting_var_id(repcrec::var_id_t var_id);
