@@ -1,7 +1,7 @@
 /**
 * @brief       RepCRec database system project.
 * @copyright   New York University.
-* @authors     Junhua Liang, Guanqun Yang.
+* @authors     Junhua Liang, Guanqun Y ang.
 * @date        2022-12-02.
 */
 
@@ -173,6 +173,7 @@ void repcrec::lock_manager::LockManager::assign_share_lock(repcrec::tran_id_t tr
     for (const repcrec::site_id_t site_id : site_id_set) {
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
         if (site->is_read_available(var_id)) {
+            lock_table_[tran_id].insert(var_id);
             std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
             var->add_shared_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
         }
