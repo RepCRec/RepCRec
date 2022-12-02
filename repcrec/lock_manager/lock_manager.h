@@ -34,6 +34,7 @@ namespace repcrec::lock_manager {
         void assign_share_lock(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& site_id_set, repcrec::var_id_t var_id);
         void assign_wait_for_graph(repcrec::tran_id_t tran_id, std::unordered_set<repcrec::site_id_t>& owner_ids);
         void release_locks(repcrec::tran_id_t tran_id);
+        void remove_self_from_wait_for_graph(repcrec::tran_id_t);
         bool detect_deadlock();
         [[nodiscard]] bool is_waiting_for_lock(repcrec::tran_id_t tran_id) const;
 

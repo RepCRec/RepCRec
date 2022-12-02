@@ -59,6 +59,7 @@ namespace repcrec::transaction_manager {
         [[nodiscard]] std::shared_ptr<repcrec::site_manager::SiteManager> get_site_manager() const;
         [[nodiscard]] std::shared_ptr<repcrec::transaction::Transaction> get_transaction(repcrec::tran_id_t tran_id) const;
         [[nodiscard]] std::shared_ptr<repcrec::lock_manager::LockManager> get_lock_manager() const;
+        [[nodiscard]] std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> get_transactions() const;
 
         static repcrec::timestamp_t curr_timestamp;
 
