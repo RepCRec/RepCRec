@@ -299,11 +299,6 @@ void repcrec::request::FailRequest::exec() {
         repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(tid);
     }
 
-    // release all its variables' lock.
-//    for (repcrec::var_id_t var_id = 1; var_id <= repcrec::VAR_COUNT; ++var_id) {
-//        std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
-//        var->get_shared_lock_owners();
-//    }
     printf("INFO (%d): Site-%d is failed.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, site_id_);
 }
 
