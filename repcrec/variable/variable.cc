@@ -15,7 +15,7 @@ std::shared_ptr<repcrec::transaction::Transaction> repcrec::variable::Variable::
     return exclusive_lock_owner_;
 }
 
-std::unordered_map<int, std::shared_ptr<repcrec::transaction::Transaction>> repcrec::variable::Variable::get_shared_lock_owners() {
+std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> repcrec::variable::Variable::get_shared_lock_owners() {
     return shared_lock_owners_;
 }
 
