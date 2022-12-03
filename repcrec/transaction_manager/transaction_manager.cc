@@ -160,7 +160,9 @@ void repcrec::transaction_manager::TransactionManager::add_to_site_waiting_map(r
 
 void repcrec::transaction_manager::TransactionManager::remove_from_site_waiting_map(repcrec::site_id_t site_id) {
     std::unordered_set<repcrec::tran_id_t> unblocked_tran_id_set;
-    for (const auto& [tid, sid] : site_waiting_map_) {
+    for (const auto& iter: site_waiting_map_) {
+        auto tid = iter.first;
+        auto sid = iter.second;
         if (sid == site_id) {
             unblocked_tran_id_set.insert(tid);
         }

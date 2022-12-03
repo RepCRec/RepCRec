@@ -38,7 +38,8 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
                 lock_status.owner_id_set.insert(var->get_exclusive_lock_owner()->get_transaction_id());
             }
             if (var->has_shared_lock_exclude_self(tran_id)) {
-                for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
+                for (const auto& iter : var->get_shared_lock_owners()) {
+                    auto shared_owner_id = iter.first;
                     lock_status.owner_id_set.insert(shared_owner_id);
                 }
             }
@@ -80,7 +81,8 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
                 lock_status.owner_id_set.insert(var->get_exclusive_lock_owner()->get_transaction_id());
             }
             if (var->has_shared_lock_exclude_self(tran_id)) {
-                for (const auto& [shared_owner_id, _] : var->get_shared_lock_owners()) {
+                for (const auto& iter : var->get_shared_lock_owners()) {
+                    auto shared_owner_id = iter.first;
                     lock_status.owner_id_set.insert(shared_owner_id);
                 }
             }
@@ -170,7 +172,9 @@ void repcrec::lock_manager::LockManager::release_locks(repcrec::tran_id_t tran_i
         }
     }
     std::unordered_set<repcrec::tran_id_t> empty_ids;
-    for (auto& [tid, tids] : wait_for_graph_) {
+    for (auto& iter : wait_for_graph_) {
+        auto tid = iter.first;
+        auto tids = iter.second;
         if (tids.count(tran_id)) {
             tids.erase(tran_id);
         }
@@ -227,7 +231,8 @@ bool repcrec::lock_manager::LockManager::is_waiting_for_lock(repcrec::tran_id_t 
 bool repcrec::lock_manager::LockManager::detect_deadlock() {
     std::unordered_map<repcrec::tran_id_t, dfs_status> visited;
     std::vector<repcrec::tran_id_t> tran_set;
-    for (const auto& [curr_tran_id, _] : wait_for_graph_) {
+    for (const auto& iter : wait_for_graph_) {
+        auto curr_tran_id = iter.first;
         tran_set.push_back(curr_tran_id);
         visited[curr_tran_id] = dfs_status::NOT_VISIT;
     }
@@ -274,7 +279,9 @@ void repcrec::lock_manager::LockManager::remove_self_from_wait_for_graph(repcrec
 }
 
 bool repcrec::lock_manager::LockManager::is_waiting_for_others(repcrec::tran_id_t tran_id) const {
-    for (const auto& [tid, tids] : wait_for_graph_) {
+    for (const auto& iter : wait_for_graph_) {
+        auto tid = iter.first;
+        auto tids = iter.second;
         if (tid != tran_id and tids.count(tran_id)) {
             return true;
         }

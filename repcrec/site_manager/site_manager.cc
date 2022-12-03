@@ -21,7 +21,8 @@ void repcrec::site_manager::SiteManager::dump() const {
     }else{
         printf("====================================================\n");
     }
-    for (const auto& [_, site] : sites_) {
+    for (const auto& iter : sites_) {
+        auto site = iter.second;
         site->dump();
     }
     if(use_file()){

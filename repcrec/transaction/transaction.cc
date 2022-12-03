@@ -25,14 +25,19 @@ repcrec::timestamp_t repcrec::transaction::Transaction::get_timestamp() const {
 
 bool repcrec::transaction::Transaction::commit(repcrec::timestamp_t commit_time) {
     std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
-    for (const auto& [site_id, _] : write_accessed_sites_) {
+    for (const auto& iter : write_accessed_sites_) {
+        auto site_id = iter.first;
         if (!site_manager->get_site(site_id)->is_write_available()) {
             repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(transaction_id_);
             return false;
         }
     }
-    for (const auto& [site_id, var_set] : read_accessed_sites_) {
-        for (const auto& [var_id, var] : var_set) {
+    for (const auto& iter : read_accessed_sites_) {
+        auto site_id = iter.first;
+        auto var_set = iter.second;
+        for (const auto& it : var_set) {
+            auto var_id = it.first;
+            auto var = it.second;
             if (!site_manager->get_site(site_id)->is_read_available(var_id)) {
                 repcrec::transaction_manager::TransactionManager::get_instance().abort_transaction(transaction_id_);
                 return false;
@@ -40,9 +45,13 @@ bool repcrec::transaction::Transaction::commit(repcrec::timestamp_t commit_time)
         }
     }
     // TODO: Solve waiting
-    for (const auto& [site_id, var_set] : write_records_) {
+    for (const auto& iter : write_records_) {
+        auto site_id = iter.first;
+        auto var_set = iter.second;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-        for (const auto& [var_id, var] : var_set) {
+        for (const auto& it : var_set) {
+            auto var_id = it.first;
+            auto var = it.second;
             site->assign_var(var_id, var, commit_time);
             site->set_read_available(var_id);
         }

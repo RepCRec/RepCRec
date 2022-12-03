@@ -290,7 +290,9 @@ void repcrec::request::FailRequest::exec() {
     site->set_unavailable();
 
     std::unordered_set<repcrec::tran_id_t> remove_transaction_id_set;
-    for (const auto& [tid, transaction] : transactions) {
+    for (const auto& iter : transactions) {
+        auto tid = iter.first;
+        auto transaction = iter.second;
         if (transaction->is_written_into_site(site_id_)) {
             remove_transaction_id_set.insert(tid);
         }
