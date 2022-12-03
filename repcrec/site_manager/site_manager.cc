@@ -11,7 +11,7 @@ std::shared_ptr<std::ofstream> repcrec::site_manager::SiteManager::write_to_file
 
 repcrec::site_manager::SiteManager::SiteManager() {
     for (int i = 1; i <= 10 ; ++i) {
-        sites_[i] = std::make_unique<repcrec::site::Site>();
+        sites_[i] = std::make_shared<repcrec::site::Site>();
     }
 }
 
