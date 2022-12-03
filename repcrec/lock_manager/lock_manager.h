@@ -37,6 +37,7 @@ namespace repcrec::lock_manager {
         void remove_self_from_wait_for_graph(repcrec::tran_id_t);
         bool detect_deadlock();
         [[nodiscard]] bool is_waiting_for_lock(repcrec::tran_id_t tran_id) const;
+        [[nodiscard]] bool is_waiting_for_others(repcrec::tran_id_t) const;
 
     private:
         std::unordered_map<repcrec::tran_id_t, std::unordered_set<repcrec::var_id_t>> lock_table_;

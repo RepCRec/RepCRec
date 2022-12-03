@@ -1,7 +1,7 @@
 /**
 * @brief       RepCRec database system project.
 * @copyright   New York University.
-* @authors     Junhua Liang, Guanqun Y ang.
+* @authors     Junhua Liang, Guanqun Yang.
 * @date        2022-12-02.
 */
 
@@ -23,7 +23,8 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
         if (var != nullptr
             and var->has_shared_lock(tran_id)
             and !var->has_shared_lock_exclude_self(tran_id)
-            and !var->has_shared_lock_exclude_self(tran_id)) {
+            and !var->has_shared_lock_exclude_self(tran_id)
+            and !is_waiting_for_others(tran_id)) {
             lock_status.site_id_set.insert(site_id);
             lock_status.status = repcrec::lock_status::HAS_READ_LOCK;
             return lock_status;
@@ -55,6 +56,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
         return lock_status;
     }
 
+    lock_status.status = repcrec::lock_status::AVAILABLE_TO_ASSIGN;
     for (repcrec::site_id_t sid = 1; sid <= repcrec::SITE_COUNT; ++sid) {
         if (!site_manager->get_site(sid)->is_write_available()) {
             continue;
@@ -63,7 +65,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
         if (var != nullptr
             and var->has_shared_lock(tran_id)
             and !var->has_shared_lock_exclude_self(tran_id)
-            and !var->has_exclusive_lock_exclude_self(tran_id)) {
+            and !var->has_exclusive_lock_exclude_self(tran_id) and !is_waiting_for_others(tran_id)) {
             lock_status.status = repcrec::lock_status::HAS_READ_LOCK;
             lock_status.site_id_set.insert(sid);
             continue;
@@ -94,7 +96,7 @@ repcrec::LockStatus repcrec::lock_manager::LockManager::try_acquire_write_lock(r
             return lock_status;
         }
     }
-    lock_status.status = repcrec::lock_status::AVAILABLE_TO_ASSIGN;
+
     return lock_status;
 }
 
@@ -192,10 +194,10 @@ void repcrec::lock_manager::LockManager::assign_write_lock(repcrec::tran_id_t tr
             std::shared_ptr<repcrec::variable::Variable> var = site->get_variable(var_id);
             if (var->has_shared_lock(tran_id)) {
                 var->remove_shared_owner(tran_id);
+                // remove_self_from_wait_for_graph(tran_id);
             }
             var->set_exclusive_transaction(repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id));
             lock_table_[tran_id].insert(var_id);
-            remove_self_from_wait_for_graph(tran_id);
         }
     }
 }
@@ -269,4 +271,13 @@ void repcrec::lock_manager::LockManager::remove_self_from_wait_for_graph(repcrec
             wait_for_graph_.erase(tran_id);
         }
     }
+}
+
+bool repcrec::lock_manager::LockManager::is_waiting_for_others(repcrec::tran_id_t tran_id) const {
+    for (const auto& [tid, tids] : wait_for_graph_) {
+        if (tid != tran_id and tids.contains(tran_id)) {
+            return true;
+        }
+    }
+    return false;
 }
