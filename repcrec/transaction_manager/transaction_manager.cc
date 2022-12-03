@@ -100,11 +100,13 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
     }
 
     std::unordered_set<repcrec::tran_id_t> finished_set;
-    for (const auto& [tran_id, request_set] : blocked_transactions_queue_) {
+    for (const auto& iter : blocked_transactions_queue_) {
+        repcrec::tran_id_t tran_id = iter.first;
+        auto request_set = iter.second;
         if (!lock_manager_->is_waiting_for_lock(tran_id) and !is_transaction_waiting_for_site(tran_id)) {
             finished_set.insert(tran_id);
-            for (const auto & iter : request_set) {
-                iter->exec();
+            for (const auto & it : request_set) {
+                it->exec();
             }
         }
     }
