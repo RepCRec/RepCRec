@@ -35,7 +35,11 @@ repcrec::request::WriteRequest::WriteRequest(repcrec::timestamp_t timestamp, rep
 void repcrec::request::WriteRequest::exec() {
     std::shared_ptr<repcrec::site_manager::SiteManager> site_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_site_manager();
     std::shared_ptr<repcrec::lock_manager::LockManager> lock_manager = repcrec::transaction_manager::TransactionManager::get_instance().get_lock_manager();
-    auto [site_id_set, status, owner_ids] = lock_manager->try_acquire_write_lock(tran_id_, var_id_);
+    auto iter = lock_manager->try_acquire_write_lock(tran_id_, var_id_);
+    // [site_id_set, status, owner_ids]
+    auto site_id_set = iter.site_id_set;
+    auto status = iter.status;
+    auto owner_ids = iter.owner_id_set;
     if ((var_id_ & 0x01) == 1) {
         int site_id = 1 + var_id_ % repcrec::SITE_COUNT;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
@@ -177,7 +181,11 @@ void repcrec::request::ReadRequest::handle_read_request() {
         repcrec::site_id_t site_id = 1 + var_id_ % 10;
         std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
         if (site->is_read_available(var_id_)) {
-            auto [site_id_set, status, owner_ids] = lock_manager->try_acquire_read_lock(tran_id_, var_id_);
+            auto iter = lock_manager->try_acquire_write_lock(tran_id_, var_id_);
+            // [site_id_set, status, owner_ids]
+            auto site_id_set = iter.site_id_set;
+            auto status = iter.status;
+            auto owner_ids = iter.owner_id_set;
             switch (status) {
                 case repcrec::lock_status::SITE_UNAVAILABLE: {
                     printf("INFO (%d): T%d is unavailable to read x%d at site%d and blocked.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site_id);
@@ -212,7 +220,11 @@ void repcrec::request::ReadRequest::handle_read_request() {
             repcrec::transaction_manager::TransactionManager::get_instance().add_request_to_blocked_queue(std::make_shared<ReadRequest>(timestamp_, tran_id_, var_id_));
         }
     } else {
-        auto [site_id_set, status, owner_ids] = lock_manager->try_acquire_read_lock(tran_id_, var_id_);
+        auto iter = lock_manager->try_acquire_write_lock(tran_id_, var_id_);
+        // [site_id_set, status, owner_ids]
+        auto site_id_set = iter.site_id_set;
+        auto status = iter.status;
+        auto owner_ids = iter.owner_id_set;
         switch (status) {
             case repcrec::lock_status::NEED_TO_WAIT: {
                 printf("INFO (%d): T%d is waiting for the locks of x%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
