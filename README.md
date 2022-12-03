@@ -1,7 +1,6 @@
 # RepCRec Design Document
 
 > Team Member
->
 > - Junhua Liang
 > - Guanqun Yang
 >
@@ -27,7 +26,7 @@ The design for this project contains 8 components. They will be structured toget
 
 #### Design Diagram
 
-![design-diagram](./docs/design-diagram.png)
+![design-diagram](design-diagram.png)
 
 #### Component Logic
 
@@ -76,10 +75,75 @@ The Request is the high-level data structure of the instruction. There are 7 typ
 ---
 
 ## Testing
+We unify the output of the testcases with two parts:
+* Keys and values on different sites after dump
+```
+====================================================
+site  1 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  2 - x 1:   10	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	x11:  110	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  3 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  4 -          	x 2:   20	x 3:   30	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	x13:  130	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  5 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  6 -          	x 2:   20	         	x 4:   77	x 5:   50	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	x15:  150	x16:  160	         	x18:  180	         	x20:  200
+site  7 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site  8 -          	x 2:   20	         	x 4:   77	         	x 6:   60	x 7:   70	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	x17:  170	x18:  180	         	x20:  200
+site  9 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	         	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	         	x20:  200
+site 10 -          	x 2:   20	         	x 4:   77	         	x 6:   60	         	x 8:   80	x 9:   90	x10:  100	         	x12:  120	         	x14:  140	         	x16:  160	         	x18:  180	x19:  190	x20:  200
+====================================================
+```
+The standard output of all 23 cases are provided under the test/output folder
+* the trace log of different transactions
+```
+INFO (10001): Create T5.
+INFO (10002): Create T4.
+INFO (10003): Create T3.
+INFO (10004): Create T2.
+INFO (10005): Create T1.
+INFO (10006): T1 gets write lock on x4.
+INFO (10006): T1 updates x4 to 5.
+INFO (10007): Abort transaction T1
+INFO (10007): Site-2 is failed.
+INFO (10008): T2 gets write lock on x4.
+INFO (10008): T2 updates x4 to 44.
+INFO (10009): Site-2 has been recovered.
+INFO (10010): T3 is waiting for the locks of x4.
+INFO (10011): T4 is waiting for the locks of x4.
+INFO (10012): T5 is waiting for the locks of x4.
+INFO (10014): T2 committed.
+INFO (10014): T5 gets write lock on x4.
+INFO (10014): T5 updates x4 to 77.
+INFO (10014): T4 is waiting for the locks of x4.
+INFO (10014): T3 is waiting for the locks of x4.
+INFO (10017): T5 committed.
+INFO (10017): T4 committed.
+INFO (10017): T3 committed.
+```
 
+In this project, we provide three testing method:
+* run the single testcase and print the log and dump result into console:
+```shell
+./RepCRecExec print Test15
+```
+
+
+* test the single testcase and output the dump result into single file under test/ (use the same name of the input file)
+```shell
+./RepCRecExec test Test15
+```
+![test-single](./docs/test-single.png)
+
+* test all testcases under test/input folder and output the dump results under test/ (use the same names of the input file)
+```shell
+./RepCRecExec run all
+```
+![test-all](./docs/test-all.png)
+
+
+**if you want to provide some extra testcase, please put it into the test/input folder and follow the format of other testcases!**
 ### Environment
-
-### Sample Results
+* C++ 11
+* Reprozip
+* cims server
 
 ---
 
