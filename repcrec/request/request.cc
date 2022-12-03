@@ -89,7 +89,7 @@ void repcrec::request::WriteRequest::exec() {
                 break;
             }
             case repcrec::lock_status::HAS_WRITE_LOCK: {
-                printf("INFO (%d): T%d already has exclusive lock on x%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
+                printf("INFO (%d): T%d already has exclusive lock on x%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
                 for (const repcrec::site_id_t site_id : site_id_set) {
                     std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
                     repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id_)->update_values(site_id, var_id_, value_);
@@ -108,7 +108,7 @@ void repcrec::request::WriteRequest::exec() {
                 break;
             }
             case repcrec::lock_status::AVAILABLE_TO_ASSIGN: {
-                printf("INFO (%d): T%d gets write lock on x%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
+                printf("INFO (%d): T%d gets write lock on x%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
                 for (const repcrec::site_id_t site_id : site_id_set) {
                     repcrec::transaction_manager::TransactionManager::get_instance().get_transaction(tran_id_)->update_values(site_id, var_id_, value_);
                 }
@@ -191,13 +191,13 @@ void repcrec::request::ReadRequest::handle_read_request() {
                 }
                 case repcrec::lock_status::HAS_READ_WRITE_LOCK: {
                     transaction->add_read_history(site_id, var_id_, site->get_variable(var_id_)->get_value());
-                    printf("INFO (%d): T%d reads x%d=%d at site%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
+                    printf("INFO (%d): T%d reads x%d=%d at site%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
                     break;
                 }
                 case repcrec::lock_status::AVAILABLE_TO_ASSIGN: {
                     lock_manager->assign_share_lock(tran_id_, site_id_set, var_id_);
                     transaction->add_read_history(site_id, var_id_, site->get_variable(var_id_)->get_value());
-                    printf("INFO (%d): T%d reads x%d=%d at site%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
+                    printf("INFO (%d): T%d reads x%d=%d at site%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value(), site_id);
                     break;
                 }
                 default: {
@@ -221,19 +221,19 @@ void repcrec::request::ReadRequest::handle_read_request() {
                 break;
             }
             case repcrec::lock_status::HAS_READ_WRITE_LOCK: {
-                printf("INFO (%d): T%d already has read-write lock on x%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
+                printf("INFO (%d): T%d already has read-write lock on x%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
                 for (const repcrec::site_id_t site_id : site_id_set) {
                     std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-                    printf("INFO (%d): T%d reads x%d=%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value());
+                    printf("INFO (%d): T%d reads x%d=%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value());
                     break;
                 }
                 break;
             }
             case repcrec::lock_status::AVAILABLE_TO_ASSIGN: {
-                printf("INFO (%d): T%d gets shared lock on x%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
+                printf("INFO (%d): T%d gets shared lock on x%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_);
                 for (const repcrec::site_id_t site_id : site_id_set) {
                     std::shared_ptr<repcrec::site::Site> site = site_manager->get_site(site_id);
-                    printf("INFO (%d): T%d reads x%d=%d\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value());
+                    printf("INFO (%d): T%d reads x%d=%d.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_, var_id_, site->get_variable(var_id_)->get_value());
                     break;
                 }
                 lock_manager->assign_share_lock(tran_id_, site_id_set, var_id_);
@@ -267,7 +267,7 @@ void repcrec::request::EndTransactionRequest::exec() {
         repcrec::transaction_manager::TransactionManager::get_instance().evict_transaction(tran_id_);
         printf("INFO (%d): T%d committed.\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_);
     } else {
-        printf("Commit Failed!\n");
+        printf("INFO (%d): T%d Commit Failed!\n", repcrec::transaction_manager::TransactionManager::curr_timestamp, tran_id_);
     }
 }
 
