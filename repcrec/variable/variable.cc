@@ -7,7 +7,9 @@
 
 #include "variable.h"
 
-repcrec::variable::Variable::Variable(repcrec::var_id_t var_id) : id_(var_id), value_(var_id * 10), latest_commit_time_(0) {}
+repcrec::variable::Variable::Variable(repcrec::var_id_t var_id) : id_(var_id), value_(var_id * 10) {
+    versions_[-1] = value_;
+}
 
 std::shared_ptr<repcrec::transaction::Transaction> repcrec::variable::Variable::get_exclusive_lock_owner() {
     return exclusive_lock_owner_;
@@ -52,12 +54,17 @@ repcrec::var_id_t repcrec::variable::Variable::get_id() const {
     return id_;
 }
 
-repcrec::var_t repcrec::variable::Variable::get_value() const {
-    return value_;
+repcrec::var_t repcrec::variable::Variable::get_value(repcrec::timestamp_t timestamp) const {
+    if (timestamp == -1) {
+        return value_;
+    }
+    auto iter = prev(versions_.upper_bound(timestamp));
+    return iter->second;
 }
 
-void repcrec::variable::Variable::set_value(repcrec::var_t value) {
+void repcrec::variable::Variable::set_value(repcrec::var_t value, repcrec::timestamp_t timestamp) {
     value_ = value;
+    versions_[timestamp] = value;
 }
 
 bool repcrec::variable::Variable::has_shared_lock(repcrec::tran_id_t tran_id) const {
@@ -74,12 +81,4 @@ bool repcrec::variable::Variable::has_shared_lock_exclude_self(repcrec::tran_id_
 
 bool repcrec::variable::Variable::has_exclusive_lock_exclude_self(repcrec::tran_id_t tran_id) const {
     return exclusive_lock_owner_ != nullptr and exclusive_lock_owner_->get_transaction_id() != tran_id;
-}
-
-repcrec::timestamp_t repcrec::variable::Variable::get_latest_commit_time() const {
-    return latest_commit_time_;
-}
-
-void repcrec::variable::Variable::set_latest_commit_time(repcrec::timestamp_t timestamp) {
-    latest_commit_time_ = timestamp;
 }

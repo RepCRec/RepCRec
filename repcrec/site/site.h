@@ -31,7 +31,6 @@ namespace repcrec::site {
 
         [[nodiscard]] bool is_read_available(repcrec::var_id_t);
         [[nodiscard]] bool is_write_available() const;
-        [[nodiscard]] repcrec::site_id_t get_site_id() const;
         void dump() const;
 
         void assign_var(repcrec::var_id_t var_id, repcrec::var_t value, repcrec::timestamp_t timestamp);

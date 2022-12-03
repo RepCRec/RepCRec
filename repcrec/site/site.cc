@@ -25,10 +25,6 @@ bool repcrec::site::Site::is_write_available() const {
     return write_available_;
 }
 
-repcrec::site_id_t repcrec::site::Site::get_site_id() const {
-    return id_;
-}
-
 void repcrec::site::Site::dump() const {
     if(!use_file()) {
         printf("site %2d - ", id_);
@@ -65,8 +61,7 @@ std::shared_ptr<repcrec::variable::Variable> repcrec::site::Site::get_variable(r
 }
 
 void repcrec::site::Site::assign_var(repcrec::var_id_t var_id, repcrec::var_t value, repcrec::timestamp_t timestamp) {
-    variables_[var_id]->set_value(value);
-    variables_[var_id]->set_latest_commit_time(timestamp);
+    variables_[var_id]->set_value(value, timestamp);
 }
 
 void repcrec::site::Site::set_unavailable() {
