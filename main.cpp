@@ -67,12 +67,12 @@ void execute_test_case_check(const string &mode) {
     cout << right << " / " << fileNames.size() << " pass" << endl;
 }
 
-void execute_advanced_database(const std::string_view &file_name, const std::string &mode) {
+void execute_advanced_database(const std::string &file_name, const std::string &mode) {
     std::ifstream insr_file;
-    insr_file.open(inputFilePath + file_name.data(), std::ios::binary);
+    insr_file.open(inputFilePath + file_name, std::ios::binary);
     std::shared_ptr<std::ofstream> outFile;
     if (mode == "test") {
-        outFile = std::make_shared<std::ofstream>(outputFilePath + file_name.data());
+        outFile = std::make_shared<std::ofstream>(outputFilePath + file_name);
         repcrec::site_manager::SiteManager::set_file(outFile);
     }
 

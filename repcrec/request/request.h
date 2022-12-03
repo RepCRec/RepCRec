@@ -9,6 +9,7 @@
 #define REPCREC_REQUEST_H
 
 #include <memory>
+#include <climits>
 
 #include "../global.h"
 #include "../instruction/instruction.h"
