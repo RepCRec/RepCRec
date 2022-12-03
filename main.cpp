@@ -5,16 +5,15 @@
 * @date        2022-12-02.
 */
 
-#include <filesystem>
 #include <iostream>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include <dirent.h>
 #include "repcrec/transaction_manager/transaction_manager.h"
 using namespace repcrec::transaction_manager;
 using namespace repcrec::instruction;
-using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
+//using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 using std::cout;
 using std::endl;
 using std::string;
@@ -27,12 +26,17 @@ void execute_test_case_check(const string &mode) {
     std::vector<std::string> fileNames;
     int right = 0;
     if (mode == "all") {
-        for (const auto &dirEntry: recursive_directory_iterator(resultFilePath)) {
-            if (dirEntry.is_directory()) {
-                continue;
+        struct dirent *entry = nullptr;
+        DIR *dp = nullptr;
+        dp = opendir(inputFilePath.c_str());
+        if (dp != nullptr) {
+            while ((entry = readdir(dp))){
+                if(entry->d_type != DT_DIR){
+                    fileNames.push_back(entry->d_name);
+                }
             }
-            fileNames.push_back(dirEntry.path().filename());
         }
+        closedir(dp);
     } else {
         fileNames.push_back(mode);
     }
@@ -102,29 +106,36 @@ int main(int argc, char **argv) {
         throw std::invalid_argument("Please specify your testing file.\n");
     }
     if (string(argv[2]) == "all") {
-        for (const auto &dirEntry: recursive_directory_iterator(inputFilePath)) {
-            cout << "---------------------------------------------------" << endl;
-            cout << "start " << dirEntry.path().filename() << endl;
-            auto pid = fork();
-            if (pid == 0) {
-                execute_advanced_database(string(dirEntry.path().filename()), "test");
-                return 0;
-            } else {
-                while (true) {
-                    int status;
-                    pid_t done = wait(&status);
-                    if (done == -1) {
-                        if (errno == ECHILD) break;
+        struct dirent *entry = nullptr;
+        DIR *dp = nullptr;
+        dp = opendir(inputFilePath.c_str());
+        if (dp != nullptr) {
+            while ((entry = readdir(dp))){
+                if(entry->d_type != DT_DIR){
+                    cout << "---------------------------------------------------" << endl;
+                    cout << "start " << entry->d_name << endl;
+                    auto pid = fork();
+                    if (pid == 0) {
+                        execute_advanced_database(string(entry->d_name), "test");
+                        return 0;
                     } else {
-                        if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-                            std::cerr << dirEntry.path().filename() << " failed" << endl;
-                            break;
+                        while (true) {
+                            int status;
+                            pid_t done = wait(&status);
+                            if (done == -1) {
+                                if (errno == ECHILD) break;
+                            } else {
+                                if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+                                    std::cerr << entry->d_name << " failed" << endl;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
+        closedir(dp);
         execute_test_case_check("all");
 
         return 0;

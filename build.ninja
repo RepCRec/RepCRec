@@ -48,55 +48,55 @@ build cmake_object_order_depends_target_RepCRecExec: phony || CMakeFiles/RepCRec
 
 build CMakeFiles/RepCRecExec.dir/main.cpp.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/main.cpp || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/main.cpp.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir
 
 build CMakeFiles/RepCRecExec.dir/repcrec/transaction_manager/transaction_manager.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/transaction_manager/transaction_manager.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/transaction_manager/transaction_manager.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/transaction_manager
 
 build CMakeFiles/RepCRecExec.dir/repcrec/site_manager/site_manager.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/site_manager/site_manager.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/site_manager/site_manager.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/site_manager
 
 build CMakeFiles/RepCRecExec.dir/repcrec/transaction/transaction.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/transaction/transaction.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/transaction/transaction.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/transaction
 
 build CMakeFiles/RepCRecExec.dir/repcrec/instruction/instruction.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/instruction/instruction.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/instruction/instruction.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/instruction
 
 build CMakeFiles/RepCRecExec.dir/repcrec/site/site.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/site/site.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/site/site.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/site
 
 build CMakeFiles/RepCRecExec.dir/repcrec/variable/variable.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/variable/variable.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/variable/variable.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/variable
 
 build CMakeFiles/RepCRecExec.dir/repcrec/lock_manager/lock_manager.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/lock_manager/lock_manager.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/lock_manager/lock_manager.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/lock_manager
 
 build CMakeFiles/RepCRecExec.dir/repcrec/request/request.cc.o: CXX_COMPILER__RepCRecExec_Debug /Users/alva112358/Desktop/adb/RepCRec/repcrec/request/request.cc || cmake_object_order_depends_target_RepCRecExec
   DEP_FILE = CMakeFiles/RepCRecExec.dir/repcrec/request/request.cc.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++17
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk -mmacosx-version-min=12.6 -std=gnu++14
   OBJECT_DIR = CMakeFiles/RepCRecExec.dir
   OBJECT_FILE_DIR = CMakeFiles/RepCRecExec.dir/repcrec/request
 
