@@ -221,7 +221,7 @@ void repcrec::lock_manager::LockManager::assign_wait_for_graph(repcrec::tran_id_
 }
 
 bool repcrec::lock_manager::LockManager::is_waiting_for_lock(repcrec::tran_id_t tran_id) const {
-    return wait_for_graph_.contains(tran_id);
+    return wait_for_graph_.contains(tran_id) and !wait_for_graph_.at(tran_id).empty();
 }
 
 bool repcrec::lock_manager::LockManager::detect_deadlock() {

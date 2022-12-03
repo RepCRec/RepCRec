@@ -9,6 +9,7 @@
 #define REPCREC_VARIABLE_H
 
 #include <unordered_map>
+#include <map>
 #include <memory>
 
 #include "../global.h"
@@ -25,6 +26,7 @@ namespace repcrec::variable {
         bool add_shared_transaction(const std::shared_ptr<repcrec::transaction::Transaction>& transaction);
         bool set_exclusive_transaction(const std::shared_ptr<repcrec::transaction::Transaction>& transaction);
         void remove_exclusive_owner();
+        void set_value(repcrec::var_t value, repcrec::timestamp_t timestamp);
         bool remove_shared_owner(repcrec::tran_id_t tran_id);
 
         [[nodiscard]] bool has_shared_lock(repcrec::tran_id_t tran_id) const;
@@ -32,17 +34,13 @@ namespace repcrec::variable {
         [[nodiscard]] bool has_shared_lock_exclude_self(repcrec::tran_id_t tran_id) const;
         [[nodiscard]] bool has_exclusive_lock_exclude_self(repcrec::tran_id_t tran_id) const;
         [[nodiscard]] repcrec::var_id_t get_id() const;
-        [[nodiscard]] repcrec::var_t get_value() const;
-        [[nodiscard]] repcrec::timestamp_t get_latest_commit_time() const;
-
-        void set_value(repcrec::var_t value);
-        void set_latest_commit_time(repcrec::timestamp_t timestamp);
+        [[nodiscard]] repcrec::var_t get_value(repcrec::timestamp_t timestamp = -1) const;
 
     private:
         repcrec::var_id_t id_;
         repcrec::var_t value_;
-        repcrec::timestamp_t latest_commit_time_;
 
+        std::map<repcrec::timestamp_t, repcrec::var_t> versions_;
         std::shared_ptr<repcrec::transaction::Transaction> exclusive_lock_owner_;
         std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> shared_lock_owners_;
     };
