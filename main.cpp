@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <memory>
 #include "repcrec/transaction_manager/transaction_manager.h"
 using namespace repcrec::transaction_manager;
 using namespace repcrec::instruction;
@@ -69,7 +70,7 @@ void execute_test_case_check(const string &mode) {
 
 void execute_advanced_database(const std::string &file_name, const std::string &mode) {
     std::ifstream insr_file;
-    insr_file.open(inputFilePath + file_name, std::ios::binary);
+    insr_file.open(inputFilePath + file_name);
     std::shared_ptr<std::ofstream> outFile;
     if (mode == "test") {
         outFile = std::make_shared<std::ofstream>(outputFilePath + file_name);
