@@ -73,7 +73,7 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
     // W(T1,x1,101)
     if (request_ != nullptr
         and request_->get_transaction_id() != -1
-        and !transactions_.contains(request_->get_transaction_id())
+        and !transactions_.count(request_->get_transaction_id())
         and !(request_->get_type() == repcrec::instruction::InstructType::BEGIN or request_->get_type() == repcrec::instruction::InstructType::BEGINO)) {
         request_ = nullptr;
         return;
@@ -82,7 +82,7 @@ void repcrec::transaction_manager::TransactionManager::execute_instructions(repc
     // When waiting, add to blocked queue
     if (request_ != nullptr
         and (lock_manager_->is_waiting_for_lock(request_->get_transaction_id())
-             or blocked_transactions_queue_.contains(request_->get_transaction_id())
+             or blocked_transactions_queue_.count(request_->get_transaction_id())
              or is_transaction_waiting_for_site(request_->get_transaction_id()))) {
         // printf("INFO: T%d instruction blocked!!!\n", request_->get_transaction_id());
         if (request_->get_type() == repcrec::instruction::InstructType::WRITE or request_->get_type() == repcrec::instruction::InstructType::READ) {
@@ -169,7 +169,7 @@ void repcrec::transaction_manager::TransactionManager::remove_from_site_waiting_
 }
 
 bool repcrec::transaction_manager::TransactionManager::is_transaction_waiting_for_site(repcrec::tran_id_t tran_id) const {
-    return site_waiting_map_.contains(tran_id);
+    return site_waiting_map_.count(tran_id);
 }
 
 std::unordered_map<repcrec::tran_id_t, std::shared_ptr<repcrec::transaction::Transaction>> repcrec::transaction_manager::TransactionManager::get_transactions() const {

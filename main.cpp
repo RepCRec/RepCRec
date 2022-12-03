@@ -75,7 +75,7 @@ void execute_advanced_database(const std::string_view &file_name, const std::str
     std::string insr;
     while (getline(insr_file, insr)) {
         // Skip dump and execute it after finishing all instructions.
-        if (insr.starts_with("dump")) {
+        if (insr.find("dump") == 0) {
             continue;
         }
         ++TransactionManager::curr_timestamp;

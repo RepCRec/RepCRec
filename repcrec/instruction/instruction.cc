@@ -14,24 +14,24 @@ repcrec::instruction::Instruction::Instruction() : id_(initial_id_++), type_(Ins
 repcrec::instruction::Instruction::Instruction(const std::string& insr) : id_(initial_id_++) {
     size_t start = insr.find_first_of('(') + 1;
     size_t end = insr.find_first_of(')');
-    if (insr.starts_with("beginRO")) {
+    if (insr.find("beginRO") == 0) {
         type_ = InstructType::BEGINO;
         tran_id_ = std::stoi(insr.substr(start + 1, end - start - 1));
-    } else if (insr.starts_with("begin")) {
+    } else if (insr.find("begin") == 0) {
         type_ = InstructType::BEGIN;
         tran_id_ = std::stoi(insr.substr(start + 1, end - start - 1));
-    } else if (insr.starts_with("end")) {
+    } else if (insr.find("end") == 0) {
         type_ = InstructType::END;
         tran_id_ = std::stoi(insr.substr(start + 1, end - start - 1));
-    } else if (insr.starts_with("dump")) {
+    } else if (insr.find("dump") == 0) {
         type_ = InstructType::DUMP;
-    } else if (insr.starts_with("recover")) {
+    } else if (insr.find("recover") == 0) {
         type_ = InstructType::RECOVER;
         site_id_ = stoi(insr.substr(start , end - start));
-    } else if (insr.starts_with("fail")) {
+    } else if (insr.find("fail") == 0) {
         type_ = InstructType::FAIL;
         site_id_ = stoi(insr.substr(start , end - start));
-    } else if (insr.starts_with("W")) {
+    } else if (insr.find("W") == 0) {
         type_ = InstructType::WRITE;
         std::string token;
         std::vector<std::string> tokens;
@@ -49,7 +49,7 @@ repcrec::instruction::Instruction::Instruction(const std::string& insr) : id_(in
         tran_id_ = std::stoi(tokens[0]);
         var_id_ = std::stoi(tokens[1].substr(1));
         var_value_ = std::stoi(tokens[2]);
-    } else if (insr.starts_with("R")) {
+    } else if (insr.find("R") == 0) {
         type_ = InstructType::READ;
         std::string token;
         std::vector<std::string> tokens;

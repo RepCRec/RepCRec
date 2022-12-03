@@ -171,7 +171,7 @@ void repcrec::lock_manager::LockManager::release_locks(repcrec::tran_id_t tran_i
     }
     std::unordered_set<repcrec::tran_id_t> empty_ids;
     for (auto& [tid, tids] : wait_for_graph_) {
-        if (tids.contains(tran_id)) {
+        if (tids.count(tran_id)) {
             tids.erase(tran_id);
         }
         if (tids.empty()) {
@@ -221,7 +221,7 @@ void repcrec::lock_manager::LockManager::assign_wait_for_graph(repcrec::tran_id_
 }
 
 bool repcrec::lock_manager::LockManager::is_waiting_for_lock(repcrec::tran_id_t tran_id) const {
-    return wait_for_graph_.contains(tran_id) and !wait_for_graph_.at(tran_id).empty();
+    return wait_for_graph_.count(tran_id) and !wait_for_graph_.at(tran_id).empty();
 }
 
 bool repcrec::lock_manager::LockManager::detect_deadlock() {
@@ -265,7 +265,7 @@ void repcrec::lock_manager::LockManager::wait_for_graph_dfs(repcrec::tran_id_t c
 }
 
 void repcrec::lock_manager::LockManager::remove_self_from_wait_for_graph(repcrec::tran_id_t tran_id) {
-    if (wait_for_graph_.contains(tran_id) and wait_for_graph_[tran_id].contains(tran_id)) {
+    if (wait_for_graph_.count(tran_id) and wait_for_graph_[tran_id].count(tran_id)) {
         wait_for_graph_[tran_id].erase(tran_id);
         if (wait_for_graph_[tran_id].empty()) {
             wait_for_graph_.erase(tran_id);
@@ -275,7 +275,7 @@ void repcrec::lock_manager::LockManager::remove_self_from_wait_for_graph(repcrec
 
 bool repcrec::lock_manager::LockManager::is_waiting_for_others(repcrec::tran_id_t tran_id) const {
     for (const auto& [tid, tids] : wait_for_graph_) {
-        if (tid != tran_id and tids.contains(tran_id)) {
+        if (tid != tran_id and tids.count(tran_id)) {
             return true;
         }
     }

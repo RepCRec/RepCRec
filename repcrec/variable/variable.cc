@@ -68,7 +68,7 @@ void repcrec::variable::Variable::set_value(repcrec::var_t value, repcrec::times
 }
 
 bool repcrec::variable::Variable::has_shared_lock(repcrec::tran_id_t tran_id) const {
-    return shared_lock_owners_.contains(tran_id);
+    return shared_lock_owners_.count(tran_id);
 }
 
 bool repcrec::variable::Variable::has_exclusive_lock(repcrec::tran_id_t tran_id) const {
@@ -76,7 +76,7 @@ bool repcrec::variable::Variable::has_exclusive_lock(repcrec::tran_id_t tran_id)
 }
 
 bool repcrec::variable::Variable::has_shared_lock_exclude_self(repcrec::tran_id_t tran_id) const {
-    return !shared_lock_owners_.empty() and !shared_lock_owners_.contains(tran_id);
+    return !shared_lock_owners_.empty() and !shared_lock_owners_.count(tran_id);
 }
 
 bool repcrec::variable::Variable::has_exclusive_lock_exclude_self(repcrec::tran_id_t tran_id) const {
