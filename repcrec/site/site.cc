@@ -26,11 +26,11 @@ bool repcrec::site::Site::is_write_available() const {
 }
 
 void repcrec::site::Site::dump() const {
-    if(!use_file()) {
+    if (!use_file()) {
         printf("site %2d - ", id_);
-    }else{
+    } else {
         (*write_to_file_)<<"site"<<std::setw(2)<<id_<<" - ";
-    };
+    }
     for (auto iter = variables_.begin(); iter != variables_.end(); ++iter) {
         if(iter->second->get_id() % 2 == 1 && id_ != iter->second->get_id() % 10 + 1){
             if(!use_file()){
