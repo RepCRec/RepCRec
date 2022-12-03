@@ -26,7 +26,7 @@ The design for this project contains 8 components. They will be structured toget
 
 #### Design Diagram
 
-![design-diagram](design-diagram.png)
+![design-diagram](./docs/design-diagram.png)
 
 #### Component Logic
 
